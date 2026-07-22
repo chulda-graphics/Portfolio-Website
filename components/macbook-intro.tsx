@@ -47,6 +47,75 @@ function createStudioEnvironment() {
   return environment;
 }
 
+type PortalPoint = { x: number; y: number };
+
+function midpoint(first: PortalPoint, second: PortalPoint): PortalPoint {
+  return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+}
+
+function extendFrom(center: PortalPoint, point: PortalPoint, amount: number): PortalPoint {
+  return {
+    x: center.x + (point.x - center.x) * amount,
+    y: center.y + (point.y - center.y) * amount,
+  };
+}
+
+function coverQuad(
+  corners: PortalPoint[],
+  sourceAspect: number,
+  screenAspect: number,
+): PortalPoint[] {
+  if (sourceAspect > screenAspect) {
+    const amount = sourceAspect / screenAspect;
+    const top = midpoint(corners[0], corners[1]);
+    const bottom = midpoint(corners[3], corners[2]);
+    return [
+      extendFrom(top, corners[0], amount),
+      extendFrom(top, corners[1], amount),
+      extendFrom(bottom, corners[2], amount),
+      extendFrom(bottom, corners[3], amount),
+    ];
+  }
+
+  const amount = screenAspect / sourceAspect;
+  const left = midpoint(corners[0], corners[3]);
+  const right = midpoint(corners[1], corners[2]);
+  return [
+    extendFrom(left, corners[0], amount),
+    extendFrom(right, corners[1], amount),
+    extendFrom(right, corners[2], amount),
+    extendFrom(left, corners[3], amount),
+  ];
+}
+
+function portalMatrix(width: number, height: number, corners: PortalPoint[]) {
+  const [topLeft, topRight, bottomRight, bottomLeft] = corners;
+  const dx1 = topRight.x - bottomRight.x;
+  const dx2 = bottomLeft.x - bottomRight.x;
+  const sx = topLeft.x - topRight.x + bottomRight.x - bottomLeft.x;
+  const dy1 = topRight.y - bottomRight.y;
+  const dy2 = bottomLeft.y - bottomRight.y;
+  const sy = topLeft.y - topRight.y + bottomRight.y - bottomLeft.y;
+  const denominator = dx1 * dy2 - dx2 * dy1;
+  const perspectiveX = Math.abs(denominator) > 0.0001
+    ? (sx * dy2 - dx2 * sy) / denominator
+    : 0;
+  const perspectiveY = Math.abs(denominator) > 0.0001
+    ? (dx1 * sy - sx * dy1) / denominator
+    : 0;
+  const scaleX = topRight.x - topLeft.x + perspectiveX * topRight.x;
+  const skewX = bottomLeft.x - topLeft.x + perspectiveY * bottomLeft.x;
+  const scaleY = topRight.y - topLeft.y + perspectiveX * topRight.y;
+  const skewY = bottomLeft.y - topLeft.y + perspectiveY * bottomLeft.y;
+
+  return `matrix3d(${[
+    scaleX / width, scaleY / width, 0, perspectiveX / width,
+    skewX / height, skewY / height, 0, perspectiveY / height,
+    0, 0, 1, 0,
+    topLeft.x, topLeft.y, 0, 1,
+  ].join(",")})`;
+}
+
 export function MacbookIntro() {
   const section = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -172,6 +241,7 @@ export function MacbookIntro() {
 
     let model: THREE.Object3D | null = null;
     let screenMesh: THREE.Mesh | null = null;
+    let screenAspect = 1.54;
     let lidPivot: THREE.Group | null = null;
     let visible = true;
     let frame = 0;
@@ -205,40 +275,44 @@ export function MacbookIntro() {
         screenMesh!.localToWorld(point).project(camera);
         return { x: (point.x + 1) * 50, y: (1 - point.y) * 50 };
       });
-      const left = Math.min(...points.map((point) => point.x));
-      const right = Math.max(...points.map((point) => point.x));
-      const top = Math.min(...points.map((point) => point.y));
-      const bottom = Math.max(...points.map((point) => point.y));
       const projectedCorners = [
         points.reduce((corner, point) => point.x + point.y < corner.x + corner.y ? point : corner),
         points.reduce((corner, point) => point.x - point.y > corner.x - corner.y ? point : corner),
         points.reduce((corner, point) => point.x + point.y > corner.x + corner.y ? point : corner),
         points.reduce((corner, point) => point.x - point.y < corner.x - corner.y ? point : corner),
-      ];
+      ].map((point) => ({
+        x: point.x * window.innerWidth / 100,
+        y: point.y * window.innerHeight / 100,
+      }));
       const portalProgress = easeInOut(clamp((revealProgress - 0.66) / 0.25));
-      const portalLeft = THREE.MathUtils.lerp(left, 0, portalProgress);
-      const portalRight = THREE.MathUtils.lerp(right, 100, portalProgress);
-      const portalTop = THREE.MathUtils.lerp(top, 0, portalProgress);
-      const portalBottom = THREE.MathUtils.lerp(bottom, 100, portalProgress);
-      const portalWidth = Math.max(portalRight - portalLeft, 0.01);
-      const portalHeight = Math.max(portalBottom - portalTop, 0.01);
-      const targetCorners = [[0, 0], [100, 0], [100, 100], [0, 100]];
-      const clipCorners = projectedCorners.map((corner, index) => {
-        const localX = ((corner.x - left) / Math.max(right - left, 0.01)) * 100;
-        const localY = ((corner.y - top) / Math.max(bottom - top, 0.01)) * 100;
-        const [targetX, targetY] = targetCorners[index];
-        return `${THREE.MathUtils.lerp(localX, targetX, portalProgress)}% ${THREE.MathUtils.lerp(localY, targetY, portalProgress)}%`;
-      });
-      const containedScale = Math.min(portalWidth / 100, portalHeight / 100);
-      const contentX = (portalWidth - 100 * containedScale) / 2;
-      const contentY = (portalHeight - 100 * containedScale) / 2;
-      portalViewport.style.width = `${portalWidth}vw`;
-      portalViewport.style.height = `${portalHeight}vh`;
-      portalViewport.style.clipPath = `polygon(${clipCorners.join(", ")})`;
+      const viewportCorners = [
+        { x: 0, y: 0 },
+        { x: window.innerWidth, y: 0 },
+        { x: window.innerWidth, y: window.innerHeight },
+        { x: 0, y: window.innerHeight },
+      ];
+      const clipCorners = projectedCorners.map((corner, index) => ({
+        x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
+        y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
+      }));
+      const screenContentCorners = coverQuad(
+        projectedCorners,
+        window.innerWidth / window.innerHeight,
+        screenAspect,
+      );
+      const contentCorners = screenContentCorners.map((corner, index) => ({
+        x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
+        y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
+      }));
+      portalViewport.style.clipPath = `polygon(${clipCorners.map((corner) => `${corner.x}px ${corner.y}px`).join(", ")})`;
       portalViewport.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
-      portalViewport.style.transform = `translate3d(${portalLeft}vw, ${portalTop}vh, 0)`;
+      portalViewport.style.transform = "none";
       workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.32, 1, easeInOut(screenPresence))})`;
-      workIndex.style.transform = `translate3d(${contentX}vw, ${contentY}vh, 0) scale(${containedScale})`;
+      workIndex.style.transform = portalMatrix(
+        window.innerWidth,
+        window.innerHeight,
+        contentCorners,
+      );
       const live = revealProgress >= 0.9;
       workIndex.inert = !live;
       workIndex.dataset.portalLive = live ? "true" : "false";
@@ -322,6 +396,13 @@ export function MacbookIntro() {
             const isScreen = material.name === "HlQwFCAPWzetDQy";
             if (isScreen) {
               screenMesh = object;
+              const screenSize = object.geometry.boundingBox?.getSize(new THREE.Vector3());
+              if (screenSize) {
+                const dimensions = [screenSize.x, screenSize.y, screenSize.z]
+                  .filter((dimension) => dimension > 0.0001)
+                  .sort((first, second) => second - first);
+                if (dimensions.length >= 2) screenAspect = dimensions[0] / dimensions[1];
+              }
               const screenMaterial = new THREE.MeshBasicMaterial({
                 transparent: true,
                 opacity: 0,
