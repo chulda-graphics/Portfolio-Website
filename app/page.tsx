@@ -25,7 +25,9 @@ export default function WorkPage() {
       <SiteHeader />
       <div className="home-entry">
         <MacbookIntroLazy />
-        <ProjectSelector />
+        <div className="home-portal" data-home-portal-viewport>
+          <ProjectSelector />
+        </div>
       </div>
       <section className="work-statement" aria-labelledby="work-statement-title">
         <p className="eyebrow">Purpose over decoration</p>

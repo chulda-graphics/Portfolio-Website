@@ -1910,18 +1910,29 @@ body[data-scrolled="true"] .site-header {
     #050505;
 }
 
-.home-entry > .work-index {
+.home-entry > .home-portal {
   position: sticky;
   z-index: 5;
   top: 0;
-  min-height: 100svh;
+  width: 100vw;
+  height: 100svh;
   overflow: hidden;
   pointer-events: none;
-  will-change: transform;
+  will-change: transform, width, height, clip-path;
 }
 
-.home-entry > .work-index[data-portal-live="true"] {
+.home-entry > .home-portal[data-portal-live="true"] {
   pointer-events: auto;
+}
+
+.home-portal > .work-index {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100svh;
+  transform-origin: top left;
+  will-change: transform, filter;
 }
 
 .macbook-intro {
@@ -2064,13 +2075,22 @@ body[data-product-intro="true"] .custom-cursor {
   overflow: visible;
 }
 
-.home-entry[data-simplified="true"] > .work-index {
+.home-entry[data-simplified="true"] > .home-portal {
   position: relative;
+  width: 100%;
+  height: auto;
   clip-path: none !important;
   border-radius: 0 !important;
   pointer-events: auto;
   transform: none !important;
   will-change: auto;
+}
+
+.home-entry[data-simplified="true"] .work-index {
+  position: relative;
+  width: 100%;
+  filter: none !important;
+  transform: none !important;
 }
 
 .home-entry[data-simplified="true"] .macbook-intro {
@@ -2728,11 +2748,21 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     overflow: visible;
   }
 
-  .home-entry > .work-index {
+  .home-entry > .home-portal {
     position: relative;
+    width: 100%;
+    height: auto;
     clip-path: none !important;
     border-radius: 0 !important;
     pointer-events: auto;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .home-portal > .work-index {
+    position: relative;
+    width: 100%;
+    filter: none !important;
     transform: none !important;
     will-change: auto;
   }

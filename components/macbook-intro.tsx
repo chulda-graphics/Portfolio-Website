@@ -57,6 +57,7 @@ export function MacbookIntro() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const simplified = reduceMotion || window.matchMedia("(max-width: 900px)").matches;
     const workIndex = document.querySelector<HTMLElement>("[data-home-portal]");
+    const portalViewport = document.querySelector<HTMLElement>("[data-home-portal-viewport]");
     const homeEntry = section.current.closest<HTMLElement>(".home-entry");
     const activateFallback = () => {
       if (section.current) {
@@ -66,11 +67,18 @@ export function MacbookIntro() {
       homeEntry?.setAttribute("data-simplified", "true");
       if (workIndex) {
         workIndex.inert = false;
-        workIndex.style.removeProperty("clip-path");
-        workIndex.style.removeProperty("border-radius");
         workIndex.style.removeProperty("transform");
         workIndex.style.removeProperty("transform-origin");
-        workIndex.style.removeProperty("visibility");
+        workIndex.style.removeProperty("filter");
+      }
+      if (portalViewport) {
+        portalViewport.style.removeProperty("clip-path");
+        portalViewport.style.removeProperty("border-radius");
+        portalViewport.style.removeProperty("transform");
+        portalViewport.style.removeProperty("transform-origin");
+        portalViewport.style.removeProperty("visibility");
+        portalViewport.style.removeProperty("width");
+        portalViewport.style.removeProperty("height");
       }
       delete document.body.dataset.productIntro;
       document.body.style.removeProperty("--product-ui-progress");
@@ -86,10 +94,11 @@ export function MacbookIntro() {
       return;
     }
 
-    if (workIndex) {
+    if (workIndex && portalViewport) {
       workIndex.inert = true;
-      workIndex.style.clipPath = "inset(50%)";
       workIndex.style.transformOrigin = "top left";
+      portalViewport.style.clipPath = "inset(50%)";
+      portalViewport.style.transformOrigin = "top left";
     }
     let renderer: THREE.WebGLRenderer;
     try {
@@ -138,11 +147,13 @@ export function MacbookIntro() {
     camera.position.copy(cameraPath.getPoint(0));
     camera.lookAt(targetPath.getPoint(0));
 
+    const entranceRig = new THREE.Group();
     const floatRig = new THREE.Group();
     const pivot = new THREE.Group();
     pivot.rotation.set(-0.025, -0.08, 0);
     floatRig.add(pivot);
-    scene.add(floatRig);
+    entranceRig.add(floatRig);
+    scene.add(entranceRig);
     scene.add(new THREE.HemisphereLight(0xf4f4ef, 0x090909, 1.55));
     const keyLight = new THREE.RectAreaLight(0xffffff, 11.5, 4.8, 3.2);
     keyLight.position.set(2.8, 4.6, 4.2);
@@ -167,6 +178,13 @@ export function MacbookIntro() {
     let progress = 0;
     let pivotRotationX = -0.07;
     let pivotRotationY = -0.2;
+    let entranceStartedAt = 0;
+
+    const restartEntrance = () => {
+      entranceStartedAt = performance.now();
+    };
+
+    window.addEventListener("dhrex:loaded", restartEntrance);
 
     const renderSize = () => {
       if (!section.current || !canvas.current) return;
@@ -177,27 +195,26 @@ export function MacbookIntro() {
       camera.updateProjectionMatrix();
     };
 
-    const updatePortal = (revealProgress: number) => {
-      if (!workIndex || !screenMesh || !canvas.current) return;
-      workIndex.style.visibility = revealProgress > 0.01 ? "visible" : "hidden";
+    const updatePortal = (revealProgress: number, screenPresence: number) => {
+      if (!workIndex || !portalViewport || !screenMesh || !canvas.current) return;
+      portalViewport.style.visibility = screenPresence > 0.06 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
-      screenMesh.geometry.computeBoundingBox();
-      const bounds = screenMesh.geometry.boundingBox;
-      if (!bounds) return;
-      const points = [
-        new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.min.z),
-        new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
-        new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
-        new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
-        new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
-        new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
-        new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
-        new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.max.z),
-      ].map((point) => screenMesh!.localToWorld(point).project(camera));
-      const left = Math.min(...points.map((point) => (point.x + 1) * 50));
-      const right = Math.max(...points.map((point) => (point.x + 1) * 50));
-      const top = Math.min(...points.map((point) => (1 - point.y) * 50));
-      const bottom = Math.max(...points.map((point) => (1 - point.y) * 50));
+      const positions = screenMesh.geometry.getAttribute("position");
+      const points = Array.from({ length: positions.count }, (_, index) => {
+        const point = new THREE.Vector3().fromBufferAttribute(positions, index);
+        screenMesh!.localToWorld(point).project(camera);
+        return { x: (point.x + 1) * 50, y: (1 - point.y) * 50 };
+      });
+      const left = Math.min(...points.map((point) => point.x));
+      const right = Math.max(...points.map((point) => point.x));
+      const top = Math.min(...points.map((point) => point.y));
+      const bottom = Math.max(...points.map((point) => point.y));
+      const projectedCorners = [
+        points.reduce((corner, point) => point.x + point.y < corner.x + corner.y ? point : corner),
+        points.reduce((corner, point) => point.x - point.y > corner.x - corner.y ? point : corner),
+        points.reduce((corner, point) => point.x + point.y > corner.x + corner.y ? point : corner),
+        points.reduce((corner, point) => point.x - point.y < corner.x - corner.y ? point : corner),
+      ];
       const portalProgress = easeInOut(clamp((revealProgress - 0.66) / 0.25));
       const portalLeft = THREE.MathUtils.lerp(left, 0, portalProgress);
       const portalRight = THREE.MathUtils.lerp(right, 100, portalProgress);
@@ -205,12 +222,27 @@ export function MacbookIntro() {
       const portalBottom = THREE.MathUtils.lerp(bottom, 100, portalProgress);
       const portalWidth = Math.max(portalRight - portalLeft, 0.01);
       const portalHeight = Math.max(portalBottom - portalTop, 0.01);
-      workIndex.style.clipPath = "inset(0)";
-      workIndex.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
-      workIndex.style.transform = `translate3d(${portalLeft}vw, ${portalTop}vh, 0) scale(${portalWidth / 100}, ${portalHeight / 100})`;
+      const targetCorners = [[0, 0], [100, 0], [100, 100], [0, 100]];
+      const clipCorners = projectedCorners.map((corner, index) => {
+        const localX = ((corner.x - left) / Math.max(right - left, 0.01)) * 100;
+        const localY = ((corner.y - top) / Math.max(bottom - top, 0.01)) * 100;
+        const [targetX, targetY] = targetCorners[index];
+        return `${THREE.MathUtils.lerp(localX, targetX, portalProgress)}% ${THREE.MathUtils.lerp(localY, targetY, portalProgress)}%`;
+      });
+      const containedScale = Math.min(portalWidth / 100, portalHeight / 100);
+      const contentX = (portalWidth - 100 * containedScale) / 2;
+      const contentY = (portalHeight - 100 * containedScale) / 2;
+      portalViewport.style.width = `${portalWidth}vw`;
+      portalViewport.style.height = `${portalHeight}vh`;
+      portalViewport.style.clipPath = `polygon(${clipCorners.join(", ")})`;
+      portalViewport.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
+      portalViewport.style.transform = `translate3d(${portalLeft}vw, ${portalTop}vh, 0)`;
+      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.32, 1, easeInOut(screenPresence))})`;
+      workIndex.style.transform = `translate3d(${contentX}vw, ${contentY}vh, 0) scale(${containedScale})`;
       const live = revealProgress >= 0.9;
       workIndex.inert = !live;
       workIndex.dataset.portalLive = live ? "true" : "false";
+      portalViewport.dataset.portalLive = live ? "true" : "false";
       canvas.current.style.visibility = portalProgress > 0.985 ? "hidden" : "visible";
     };
 
@@ -244,11 +276,20 @@ export function MacbookIntro() {
         delete document.body.dataset.productIntro;
         document.body.style.removeProperty("--product-ui-progress");
       }
-      updatePortal(approachProgress);
+      updatePortal(approachProgress, openingProgress);
     };
 
     const draw = (time: number) => {
       if (visible) {
+        const entranceLinear = entranceStartedAt
+          ? clamp((time - entranceStartedAt) / 1700)
+          : 0;
+        const entranceProgress = easeInOut(entranceLinear);
+        entranceRig.scale.setScalar(THREE.MathUtils.lerp(0.72, 1, entranceProgress));
+        entranceRig.position.y = THREE.MathUtils.lerp(-0.2, 0, entranceProgress);
+        entranceRig.position.z = THREE.MathUtils.lerp(-0.8, 0, entranceProgress);
+        entranceRig.rotation.y = THREE.MathUtils.lerp(0.1, 0, entranceProgress);
+        entranceRig.rotation.z = THREE.MathUtils.lerp(-0.022, 0, entranceProgress);
         const openingPresence = 1 - easeInOut(clamp((progress - 0.32) / 0.3));
         floatRig.position.y = Math.sin(time * 0.00055) * 0.018 * openingPresence;
         floatRig.rotation.z = Math.cos(time * 0.00042) * 0.004 * openingPresence;
@@ -328,6 +369,7 @@ export function MacbookIntro() {
         const scale = 3.55 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         pivot.add(model);
+        entranceStartedAt = performance.now();
         updateProgress();
         section.current?.setAttribute("data-model-ready", "true");
         window.dispatchEvent(new Event("dhrex:model-ready"));
@@ -352,16 +394,25 @@ export function MacbookIntro() {
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      window.removeEventListener("dhrex:loaded", restartEntrance);
       window.removeEventListener("resize", renderSize);
       window.removeEventListener("scroll", updateProgress);
       if (workIndex) {
         workIndex.inert = false;
-        workIndex.style.removeProperty("clip-path");
-        workIndex.style.removeProperty("border-radius");
         workIndex.style.removeProperty("transform");
         workIndex.style.removeProperty("transform-origin");
-        workIndex.style.removeProperty("visibility");
+        workIndex.style.removeProperty("filter");
         delete workIndex.dataset.portalLive;
+      }
+      if (portalViewport) {
+        portalViewport.style.removeProperty("clip-path");
+        portalViewport.style.removeProperty("border-radius");
+        portalViewport.style.removeProperty("transform");
+        portalViewport.style.removeProperty("transform-origin");
+        portalViewport.style.removeProperty("visibility");
+        portalViewport.style.removeProperty("width");
+        portalViewport.style.removeProperty("height");
+        delete portalViewport.dataset.portalLive;
       }
       delete document.body.dataset.productIntro;
       document.body.style.removeProperty("--product-ui-progress");
