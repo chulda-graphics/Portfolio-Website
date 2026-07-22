@@ -51,6 +51,45 @@ function createStudioEnvironment() {
 
 type PortalPoint = { x: number; y: number };
 
+function midpoint(first: PortalPoint, second: PortalPoint): PortalPoint {
+  return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+}
+
+function scaleFrom(center: PortalPoint, point: PortalPoint, amount: number): PortalPoint {
+  return {
+    x: center.x + (point.x - center.x) * amount,
+    y: center.y + (point.y - center.y) * amount,
+  };
+}
+
+function containQuad(
+  corners: PortalPoint[],
+  sourceAspect: number,
+  screenAspect: number,
+): PortalPoint[] {
+  if (sourceAspect > screenAspect) {
+    const amount = screenAspect / sourceAspect;
+    const left = midpoint(corners[0], corners[3]);
+    const right = midpoint(corners[1], corners[2]);
+    return [
+      scaleFrom(left, corners[0], amount),
+      scaleFrom(right, corners[1], amount),
+      scaleFrom(right, corners[2], amount),
+      scaleFrom(left, corners[3], amount),
+    ];
+  }
+
+  const amount = sourceAspect / screenAspect;
+  const top = midpoint(corners[0], corners[1]);
+  const bottom = midpoint(corners[3], corners[2]);
+  return [
+    scaleFrom(top, corners[0], amount),
+    scaleFrom(top, corners[1], amount),
+    scaleFrom(bottom, corners[2], amount),
+    scaleFrom(bottom, corners[3], amount),
+  ];
+}
+
 function portalMatrix(width: number, height: number, corners: PortalPoint[]) {
   const [topLeft, topRight, bottomRight, bottomLeft] = corners;
   const dx1 = topRight.x - bottomRight.x;
@@ -159,33 +198,21 @@ export function MacbookIntro() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(CAMERA_VERTICAL_FOV, 1, 0.01, 100);
     const revealCameraPath = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(1.5, 1.55, 7.2),
-      new THREE.Vector3(1.3, 1.36, 7.15),
-      new THREE.Vector3(0.82, 1.16, 7.1),
-      new THREE.Vector3(0.12, 1.02, 6.9),
+      new THREE.Vector3(0.42, 1.45, 7.4),
+      new THREE.Vector3(0.32, 1.33, 7.25),
+      new THREE.Vector3(0.18, 1.15, 7.05),
+      new THREE.Vector3(0.05, 1.02, 6.9),
     ]);
     const revealTargetPath = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.03, 0.04, 0),
-      new THREE.Vector3(0.02, 0.12, 0.01),
-      new THREE.Vector3(-0.015, 0.22, 0.005),
+      new THREE.Vector3(0, 0.04, 0),
+      new THREE.Vector3(0, 0.12, 0.01),
+      new THREE.Vector3(0, 0.22, 0.005),
       new THREE.Vector3(0, 0.28, 0),
-    ]);
-    const cameraPath = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.12, 1.02, 6.9),
-      new THREE.Vector3(0.07, 0.82, 4.7),
-      new THREE.Vector3(0.025, 0.54, 2.4),
-      new THREE.Vector3(0, 0.35, 0.92),
-    ]);
-    const targetPath = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0.28, 0),
-      new THREE.Vector3(0, 0.31, 0.015),
-      new THREE.Vector3(0, 0.34, 0.035),
-      new THREE.Vector3(0, 0.35, 0.05),
     ]);
     const displayCenterTarget = new THREE.Vector3(0, 0.35, 0.05);
     const displayNormalTarget = new THREE.Vector3(0, 0, 1);
-    camera.position.copy(cameraPath.getPoint(0));
-    camera.lookAt(targetPath.getPoint(0));
+    camera.position.copy(revealCameraPath.getPoint(1));
+    camera.lookAt(revealTargetPath.getPoint(1));
 
     const entranceRig = new THREE.Group();
     const floatRig = new THREE.Group();
@@ -212,6 +239,11 @@ export function MacbookIntro() {
 
     let model: THREE.Object3D | null = null;
     let screenMesh: THREE.Mesh | null = null;
+    let displayLocalCorners: THREE.Vector3[] = [];
+    let displayAspect = 1.54;
+    let displayWidth = 0;
+    let displayHeight = 0;
+    let handoffDistance = 3.2;
     let lidPivot: THREE.Group | null = null;
     let visible = true;
     let frame = 0;
@@ -220,7 +252,7 @@ export function MacbookIntro() {
     let approachProgress = 0;
     let portalDirty = true;
     let pivotRotationX = -0.07;
-    let pivotRotationY = -0.2;
+    let pivotRotationY = -0.1;
     let entranceStartedAt = 0;
 
     const restartEntrance = () => {
@@ -228,6 +260,15 @@ export function MacbookIntro() {
     };
 
     window.addEventListener("dhrex:loaded", restartEntrance);
+
+    const updateHandoffDistance = () => {
+      if (displayWidth <= 0 || displayHeight <= 0) return;
+      const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+      const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
+      const fitWidth = displayWidth / (2 * Math.tan(horizontalFov / 2));
+      const fitHeight = displayHeight / (2 * Math.tan(verticalFov / 2));
+      handoffDistance = Math.max(fitWidth, fitHeight) * 1.045;
+    };
 
     const renderSize = () => {
       if (!section.current || !canvas.current) return;
@@ -244,29 +285,29 @@ export function MacbookIntro() {
           )
         : CAMERA_VERTICAL_FOV;
       camera.updateProjectionMatrix();
+      updateHandoffDistance();
       portalDirty = true;
     };
 
     const updatePortal = (revealProgress: number, screenPresence: number) => {
-      if (!workIndex || !portalViewport || !screenMesh || !canvas.current) return;
-      portalViewport.style.visibility = screenPresence > 0.002 ? "visible" : "hidden";
+      if (
+        !workIndex
+        || !portalViewport
+        || !screenMesh
+        || !canvas.current
+        || displayLocalCorners.length !== 4
+      ) return;
+      portalViewport.style.visibility = screenPresence > 0.0001 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
-      const positions = screenMesh.geometry.getAttribute("position");
-      const points = Array.from({ length: positions.count }, (_, index) => {
-        const point = new THREE.Vector3().fromBufferAttribute(positions, index);
+      const projectedCorners = displayLocalCorners.map((localCorner) => {
+        const point = localCorner.clone();
         screenMesh!.localToWorld(point).project(camera);
-        return { x: (point.x + 1) * 50, y: (1 - point.y) * 50 };
+        return {
+          x: (point.x + 1) * window.innerWidth / 2,
+          y: (1 - point.y) * window.innerHeight / 2,
+        };
       });
-      const projectedCorners = [
-        points.reduce((corner, point) => point.x + point.y < corner.x + corner.y ? point : corner),
-        points.reduce((corner, point) => point.x - point.y > corner.x - corner.y ? point : corner),
-        points.reduce((corner, point) => point.x + point.y > corner.x + corner.y ? point : corner),
-        points.reduce((corner, point) => point.x - point.y < corner.x - corner.y ? point : corner),
-      ].map((point) => ({
-        x: point.x * window.innerWidth / 100,
-        y: point.y * window.innerHeight / 100,
-      }));
-      const portalProgress = easeInOut(clamp((revealProgress - 0.52) / 0.34));
+      const portalProgress = easeInOut(clamp((revealProgress - 0.58) / 0.36));
       const viewportCorners = [
         { x: 0, y: 0 },
         { x: window.innerWidth, y: 0 },
@@ -277,7 +318,12 @@ export function MacbookIntro() {
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
       }));
-      const contentCorners = projectedCorners.map((corner, index) => ({
+      const containedCorners = containQuad(
+        projectedCorners,
+        window.innerWidth / window.innerHeight,
+        displayAspect,
+      );
+      const contentCorners = containedCorners.map((corner, index) => ({
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
       }));
@@ -285,7 +331,7 @@ export function MacbookIntro() {
       portalViewport.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
       portalViewport.style.transform = "none";
       const displayPresence = easeInOut(screenPresence);
-      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.68, 1, displayPresence)})`;
+      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.78, 1, displayPresence)})`;
       workIndex.style.transform = portalMatrix(
         window.innerWidth,
         window.innerHeight,
@@ -317,21 +363,24 @@ export function MacbookIntro() {
         camera.position.copy(revealCameraPath.getPoint(openingProgress));
         camera.lookAt(revealTargetPath.getPoint(openingProgress));
       } else {
-        const curvePosition = cameraPath.getPoint(approachEased);
-        const curveTarget = targetPath.getPoint(approachEased);
-        const straightProgress = easeInOut(clamp((approachProgress - 0.38) / 0.62));
-        const alignment = easeInOut(clamp((approachProgress - 0.45) / 0.3));
-        const straightPosition = displayCenterTarget.clone().addScaledVector(
-          displayNormalTarget,
-          THREE.MathUtils.lerp(3.45, 3.08, straightProgress),
-        );
-        camera.position.copy(curvePosition).lerp(straightPosition, alignment);
-        camera.lookAt(curveTarget.lerp(displayCenterTarget, alignment));
+        const inverse = 1 - approachEased;
+        const start = revealCameraPath.getPoint(1);
+        const control = displayCenterTarget.clone()
+          .addScaledVector(displayNormalTarget, handoffDistance + 2.25)
+          .add(new THREE.Vector3(0.12, 0.18, 0));
+        const end = displayCenterTarget.clone()
+          .addScaledVector(displayNormalTarget, handoffDistance);
+        camera.position.copy(start).multiplyScalar(inverse * inverse)
+          .addScaledVector(control, 2 * inverse * approachEased)
+          .addScaledVector(end, approachEased * approachEased);
+        const target = revealTargetPath.getPoint(1)
+          .lerp(displayCenterTarget, approachEased);
+        camera.lookAt(target);
       }
       if (lidPivot) lidPivot.rotation.x = THREE.MathUtils.lerp(CLOSED_LID_ROTATION, 0, openingProgress);
       pivotRotationY = approachProgress > 0
-        ? THREE.MathUtils.lerp(-0.08, 0, approachEased)
-        : THREE.MathUtils.lerp(-0.2, -0.08, openingProgress);
+        ? THREE.MathUtils.lerp(-0.05, 0, approachEased)
+        : THREE.MathUtils.lerp(-0.1, -0.05, openingProgress);
       pivotRotationX = approachProgress > 0
         ? THREE.MathUtils.lerp(-0.03, 0, approachEased)
         : THREE.MathUtils.lerp(-0.07, -0.03, openingProgress);
@@ -353,7 +402,7 @@ export function MacbookIntro() {
           : 0;
         const entranceProgress = easeInOut(entranceLinear);
         entranceRig.scale.setScalar(THREE.MathUtils.lerp(0.72, 1, entranceProgress));
-        entranceRig.position.x = THREE.MathUtils.lerp(0.18, 0, entranceProgress);
+        entranceRig.position.x = THREE.MathUtils.lerp(0.06, 0, entranceProgress);
         entranceRig.position.y = THREE.MathUtils.lerp(-0.2, 0, entranceProgress);
         entranceRig.position.z = THREE.MathUtils.lerp(-0.8, 0, entranceProgress);
         entranceRig.rotation.x = THREE.MathUtils.lerp(0.04, 0, entranceProgress);
@@ -473,7 +522,14 @@ export function MacbookIntro() {
             screenPoints.reduce((corner, point) => point.x - point.y > corner.x - corner.y ? point : corner),
             screenPoints.reduce((corner, point) => point.x + point.y < corner.x + corner.y ? point : corner),
           ];
-          const worldCorners = localCorners.map((corner) => {
+          const orderedLocalCorners = [
+            localCorners[3],
+            localCorners[2],
+            localCorners[1],
+            localCorners[0],
+          ];
+          displayLocalCorners = orderedLocalCorners.map((corner) => corner.clone());
+          const worldCorners = orderedLocalCorners.map((corner) => {
             const worldCorner = corner.clone();
             screenMesh!.localToWorld(worldCorner);
             return worldCorner;
@@ -487,15 +543,10 @@ export function MacbookIntro() {
           if (displayNormal.z < 0) displayNormal.negate();
           displayCenterTarget.copy(displayCenter);
           displayNormalTarget.copy(displayNormal);
-
-          targetPath.points[2].copy(displayCenter);
-          targetPath.points[3].copy(displayCenter);
-          cameraPath.points[2]
-            .copy(displayCenter)
-            .addScaledVector(displayNormal, 2.4);
-          cameraPath.points[3]
-            .copy(displayCenter)
-            .addScaledVector(displayNormal, 3.08);
+          displayWidth = worldCorners[0].distanceTo(worldCorners[1]);
+          displayHeight = worldCorners[0].distanceTo(worldCorners[3]);
+          displayAspect = displayWidth / displayHeight;
+          updateHandoffDistance();
 
           lidPivot.rotation.x = savedLidRotation;
           pivot.rotation.copy(savedPivotRotation);
