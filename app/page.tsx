@@ -23,8 +23,10 @@ export default function WorkPage() {
       />
       <LoadingScreen />
       <SiteHeader />
-      <MacbookIntroLazy />
-      <ProjectSelector />
+      <div className="home-entry">
+        <MacbookIntroLazy />
+        <ProjectSelector />
+      </div>
       <section className="work-statement" aria-labelledby="work-statement-title">
         <p className="eyebrow">Purpose over decoration</p>
         <h2 id="work-statement-title">

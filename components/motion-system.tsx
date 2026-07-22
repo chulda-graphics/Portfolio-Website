@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const BOOKING_EVENT = "dhrex:open-booking";
 
@@ -10,38 +10,70 @@ export function openBooking() {
   window.dispatchEvent(new Event(BOOKING_EVENT));
 }
 
+function routeName(pathname: string) {
+  if (pathname === "/") return "Selected work";
+  if (pathname === "/about") return "About";
+  if (pathname === "/contact") return "Contact";
+  if (pathname.includes("stillsearch")) return "StillSearch";
+  if (pathname.includes("demo-reel")) return "Demo Reel 2026";
+  return "Dhrex";
+}
+
 export function MotionSystem() {
   const pathname = usePathname();
   const router = useRouter();
   const [transition, setTransition] = useState<"idle" | "covering" | "revealing">("idle");
+  const [destinationLabel, setDestinationLabel] = useState(routeName(pathname));
   const [bookingOpen, setBookingOpen] = useState(false);
   const transitionTimer = useRef<number | null>(null);
   const navigationPending = useRef(false);
+  const previousPath = useRef(pathname);
+  const lenis = useRef<Lenis | null>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const dialog = useRef<HTMLDivElement>(null);
   const cursor = useRef<HTMLDivElement>(null);
   const cursorLabel = useRef<HTMLSpanElement>(null);
 
+  const resetScrollState = useCallback(() => {
+    lenis.current?.scrollTo(0, { immediate: true, force: true });
+    document.documentElement.style.scrollBehavior = "auto";
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+    document.querySelectorAll<HTMLElement>(".case-horizontal-track").forEach((track) => {
+      track.style.transform = "translate3d(0,0,0)";
+      track.parentElement?.scrollTo({ left: 0, top: 0, behavior: "auto" });
+    });
+    document.querySelectorAll<HTMLElement>(".frame-touch-rail, [data-scroll-reset]").forEach((container) => {
+      container.scrollTo({ left: 0, top: 0, behavior: "auto" });
+    });
+    requestAnimationFrame(() => {
+      document.documentElement.style.removeProperty("scroll-behavior");
+    });
+  }, []);
+
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return;
 
-    const lenis = new Lenis({
+    const smoothScroll = new Lenis({
       duration: 1.08,
       smoothWheel: true,
       syncTouch: false,
       wheelMultiplier: 0.9,
       easing: (value) => Math.min(1, 1.001 - 2 ** (-10 * value)),
     });
+    lenis.current = smoothScroll;
     let frame = 0;
     const render = (time: number) => {
-      lenis.raf(time);
+      smoothScroll.raf(time);
       frame = requestAnimationFrame(render);
     };
     frame = requestAnimationFrame(render);
     return () => {
       cancelAnimationFrame(frame);
-      lenis.destroy();
+      lenis.current = null;
+      smoothScroll.destroy();
     };
   }, []);
 
@@ -58,11 +90,47 @@ export function MotionSystem() {
   }, []);
 
   useEffect(() => {
-    if (!navigationPending.current) return;
-    navigationPending.current = false;
-    setTransition("revealing");
-    transitionTimer.current = window.setTimeout(() => setTransition("idle"), 720);
-  }, [pathname]);
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    setDestinationLabel(routeName(pathname));
+    resetScrollState();
+    let firstFrame = 0;
+    let secondFrame = 0;
+    firstFrame = requestAnimationFrame(() => {
+      resetScrollState();
+      secondFrame = requestAnimationFrame(() => {
+        resetScrollState();
+        setTransition("revealing");
+        lenis.current?.start();
+        if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+        transitionTimer.current = window.setTimeout(() => {
+          setTransition("idle");
+          navigationPending.current = false;
+          delete document.body.dataset.routeTransition;
+        }, 620);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, [pathname, resetScrollState]);
+
+  useEffect(() => {
+    const previousRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    const onPopState = () => {
+      navigationPending.current = true;
+      document.body.dataset.routeTransition = "true";
+      lenis.current?.stop();
+      setTransition("covering");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      history.scrollRestoration = previousRestoration;
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, []);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -73,7 +141,7 @@ export function MotionSystem() {
         event.ctrlKey ||
         event.shiftKey ||
         event.altKey ||
-        transition !== "idle"
+        navigationPending.current
       ) {
         return;
       }
@@ -94,18 +162,26 @@ export function MotionSystem() {
 
       event.preventDefault();
       navigationPending.current = true;
+      setDestinationLabel(routeName(destination.pathname));
+      document.body.dataset.routeTransition = "true";
+      lenis.current?.stop();
       setTransition("covering");
+      if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
       transitionTimer.current = window.setTimeout(() => {
-        router.push(`${destination.pathname}${destination.search}${destination.hash}`);
-      }, 430);
+        resetScrollState();
+        router.push(`${destination.pathname}${destination.search}${destination.hash}`, { scroll: false });
+      }, 400);
     };
 
     document.addEventListener("click", onClick);
     return () => {
       document.removeEventListener("click", onClick);
-      if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
     };
-  }, [router, transition]);
+  }, [resetScrollState, router]);
+
+  useEffect(() => () => {
+    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+  }, []);
 
   useEffect(() => {
     const showBooking = () => setBookingOpen(true);
@@ -190,9 +266,16 @@ export function MotionSystem() {
 
   return (
     <>
-      <div className="route-transition" data-phase={transition} aria-hidden="true">
-        <span>Dhrex</span>
-        <span>Clarity in motion</span>
+      <div className="route-transition" data-phase={transition} aria-hidden={transition === "idle"}>
+        <div className="route-transition-topline">
+          <span>Dhrex</span>
+          <span>Clarity in motion</span>
+        </div>
+        <div className="route-transition-title">
+          <span>00</span>
+          <strong>{destinationLabel}</strong>
+        </div>
+        <div className="route-transition-rail" aria-hidden="true"><span /></div>
       </div>
 
       <div ref={cursor} className="custom-cursor" data-visible="false" aria-hidden="true">

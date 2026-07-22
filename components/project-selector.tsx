@@ -69,7 +69,7 @@ export function ProjectSelector() {
   );
 
   return (
-    <section className="work-index" aria-labelledby="work-title">
+    <section className="work-index" data-home-portal aria-labelledby="work-title">
       <div className="work-intro">
         <p className="eyebrow">Selected work / 2026</p>
         <h1 id="work-title">

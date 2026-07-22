@@ -15,51 +15,34 @@ function easeInOut(value: number) {
     : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 }
 
-function createHomepageTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1600;
-  canvas.height = 1000;
-  const context = canvas.getContext("2d");
-  if (!context) return null;
-
-  context.fillStyle = "#050505";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#f5f5f2";
-  context.font = "600 34px 'DM Sans', sans-serif";
-  context.fillText("Dhrex", 80, 92);
-  context.fillStyle = "#888884";
-  context.font = "500 17px 'DM Sans', sans-serif";
-  context.fillText("WORK     ABOUT     CONTACT", 1210, 88);
-  context.fillStyle = "#f5f5f2";
-  context.font = "500 102px 'DM Sans', sans-serif";
-  context.fillText("CLARITY,", 80, 350);
-  context.fillText("SET IN MOTION.", 80, 454);
-  context.strokeStyle = "rgba(255,255,255,.22)";
-  context.lineWidth = 2;
-  context.strokeRect(890, 170, 620, 560);
-  context.fillStyle = "#141414";
-  context.fillRect(906, 186, 588, 528);
-  context.strokeStyle = "rgba(255,255,255,.12)";
-  for (let line = 0; line < 6; line += 1) {
-    const y = 250 + line * 68;
-    context.beginPath();
-    context.moveTo(954, y);
-    context.lineTo(1444, y);
-    context.stroke();
-  }
-  context.fillStyle = "#f5f5f2";
-  context.font = "500 30px 'DM Sans', sans-serif";
-  context.fillText("DEMO REEL 2026", 938, 665);
-  context.strokeStyle = "rgba(255,255,255,.28)";
-  context.beginPath();
-  context.moveTo(80, 850);
-  context.lineTo(1520, 850);
-  context.stroke();
-  context.fillStyle = "#8e8e89";
-  context.font = "500 20px 'DM Sans', sans-serif";
-  context.fillText("PRODUCT MOTION / LAUNCH FILMS / UI ANIMATION", 80, 902);
-  context.fillText("REMOTE WORLDWIDE", 1320, 902);
-  return canvas;
+function createStudioEnvironment() {
+  const faces = [
+    ["#d9d9d5", "#191919"],
+    ["#8e9699", "#090909"],
+    ["#f5f5f0", "#3e4142"],
+    ["#202020", "#050505"],
+    ["#b8bcbd", "#101010"],
+    ["#55595b", "#050505"],
+  ];
+  const images = faces.map(([highlight, shadow]) => {
+    const face = document.createElement("canvas");
+    face.width = 64;
+    face.height = 64;
+    const context = face.getContext("2d");
+    if (context) {
+      const gradient = context.createLinearGradient(0, 0, 64, 64);
+      gradient.addColorStop(0, highlight);
+      gradient.addColorStop(0.28, "#313334");
+      gradient.addColorStop(1, shadow);
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 64, 64);
+    }
+    return face;
+  });
+  const environment = new THREE.CubeTexture(images);
+  environment.colorSpace = THREE.SRGBColorSpace;
+  environment.needsUpdate = true;
+  return environment;
 }
 
 export function MacbookIntro() {
@@ -70,6 +53,35 @@ export function MacbookIntro() {
   useEffect(() => {
     if (!section.current || !canvas.current) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const simplified = reduceMotion || window.matchMedia("(max-width: 900px)").matches;
+    const workIndex = document.querySelector<HTMLElement>("[data-home-portal]");
+    const homeEntry = section.current.closest<HTMLElement>(".home-entry");
+    const activateFallback = () => {
+      if (section.current) {
+        section.current.dataset.simplified = "true";
+        section.current.dataset.modelError = "true";
+      }
+      homeEntry?.setAttribute("data-simplified", "true");
+      if (workIndex) {
+        workIndex.inert = false;
+        workIndex.style.removeProperty("clip-path");
+      }
+      window.dispatchEvent(new Event("dhrex:model-ready"));
+    };
+
+    if (simplified) {
+      section.current.dataset.simplified = "true";
+      section.current.dataset.modelReady = "true";
+      homeEntry?.setAttribute("data-simplified", "true");
+      if (workIndex) workIndex.inert = false;
+      window.dispatchEvent(new Event("dhrex:model-ready"));
+      return;
+    }
+
+    if (workIndex) {
+      workIndex.inert = true;
+      workIndex.style.clipPath = "inset(50%)";
+    }
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
@@ -79,33 +91,53 @@ export function MacbookIntro() {
         powerPreference: "high-performance",
       });
     } catch {
-      section.current.dataset.modelError = "true";
+      activateFallback();
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.55));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.28;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(33, 1, 0.01, 100);
-    camera.position.set(0.15, 1.05, 7.2);
-    camera.lookAt(0, 0.25, 0);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 100);
+    const cameraPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.12, 1.02, 6.9),
+      new THREE.Vector3(0.07, 0.82, 4.7),
+      new THREE.Vector3(0.025, 0.42, 2.4),
+      new THREE.Vector3(0, -0.06, 0.92),
+    ]);
+    const targetPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.28, 0),
+      new THREE.Vector3(0, 0.31, 0.015),
+      new THREE.Vector3(0, 0.34, 0.035),
+      new THREE.Vector3(0, 0.35, 0.05),
+    ]);
+    camera.position.copy(cameraPath.getPoint(0));
+    camera.lookAt(targetPath.getPoint(0));
 
     const pivot = new THREE.Group();
     pivot.rotation.set(-0.025, -0.08, 0);
     scene.add(pivot);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x101010, 2.15));
-    const keyLight = new THREE.DirectionalLight(0xffffff, 5.2);
-    keyLight.position.set(3.5, 5, 4);
+    scene.add(new THREE.HemisphereLight(0xf4f4ef, 0x090909, 1.55));
+    const keyLight = new THREE.RectAreaLight(0xffffff, 8.5, 4.8, 3.2);
+    keyLight.position.set(2.8, 4.6, 4.2);
+    keyLight.lookAt(0, 0.25, 0);
     scene.add(keyLight);
-    const rimLight = new THREE.DirectionalLight(0xd8d8d2, 1.7);
-    rimLight.position.set(-4, 2, -2);
+    const fillLight = new THREE.RectAreaLight(0xc8d0d3, 3.2, 3.2, 4.5);
+    fillLight.position.set(-3.8, 1.6, 3.1);
+    fillLight.lookAt(0, 0.2, 0);
+    scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 3.8);
+    rimLight.position.set(-4.5, 3.2, -1.5);
     scene.add(rimLight);
 
+    const studioEnvironment = createStudioEnvironment();
+    scene.environment = studioEnvironment;
+
     let model: THREE.Object3D | null = null;
-    let homepageTexture: THREE.CanvasTexture | null = null;
+    let screenMesh: THREE.Mesh | null = null;
     let visible = true;
     let frame = 0;
     let progress = 0;
@@ -119,45 +151,61 @@ export function MacbookIntro() {
       camera.updateProjectionMatrix();
     };
 
+    const updatePortal = (revealProgress: number) => {
+      if (!workIndex || !screenMesh || !canvas.current) return;
+      pivot.updateMatrixWorld(true);
+      screenMesh.geometry.computeBoundingBox();
+      const bounds = screenMesh.geometry.boundingBox;
+      if (!bounds) return;
+      const points = [
+        new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.min.z),
+        new THREE.Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
+        new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
+        new THREE.Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
+        new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
+        new THREE.Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
+        new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
+        new THREE.Vector3(bounds.max.x, bounds.max.y, bounds.max.z),
+      ].map((point) => screenMesh!.localToWorld(point).project(camera));
+      const left = Math.min(...points.map((point) => (point.x + 1) * 50));
+      const right = Math.max(...points.map((point) => (point.x + 1) * 50));
+      const top = Math.min(...points.map((point) => (1 - point.y) * 50));
+      const bottom = Math.max(...points.map((point) => (1 - point.y) * 50));
+      const portalProgress = easeInOut(clamp((revealProgress - 0.66) / 0.25));
+      const portalLeft = THREE.MathUtils.lerp(left, 0, portalProgress);
+      const portalRight = THREE.MathUtils.lerp(right, 100, portalProgress);
+      const portalTop = THREE.MathUtils.lerp(top, 0, portalProgress);
+      const portalBottom = THREE.MathUtils.lerp(bottom, 100, portalProgress);
+      workIndex.style.clipPath = `polygon(${portalLeft}% ${portalTop}%, ${portalRight}% ${portalTop}%, ${portalRight}% ${portalBottom}%, ${portalLeft}% ${portalBottom}%)`;
+      const live = revealProgress >= 0.9;
+      workIndex.inert = !live;
+      workIndex.dataset.portalLive = live ? "true" : "false";
+      canvas.current.style.visibility = portalProgress > 0.985 ? "hidden" : "visible";
+    };
+
     const updateProgress = () => {
       if (!section.current) return;
       const rect = section.current.getBoundingClientRect();
       const distance = Math.max(section.current.offsetHeight - window.innerHeight, 1);
       progress = clamp(-rect.top / distance);
       const eased = easeInOut(progress);
-      camera.position.x = THREE.MathUtils.lerp(0.15, 0, eased);
-      camera.position.y = THREE.MathUtils.lerp(1.05, -0.05, eased);
-      camera.position.z = THREE.MathUtils.lerp(7.2, 1.35, eased);
-      camera.lookAt(
-        0,
-        THREE.MathUtils.lerp(0.25, 0.35, eased),
-        THREE.MathUtils.lerp(0, 0.05, eased),
-      );
+      camera.position.copy(cameraPath.getPoint(eased));
+      camera.lookAt(targetPath.getPoint(eased));
       pivot.rotation.y = THREE.MathUtils.lerp(-0.08, 0, eased);
       pivot.rotation.x = THREE.MathUtils.lerp(-0.03, 0, eased);
       if (introCopy.current) {
         const copyExit = easeInOut(clamp(progress / 0.24));
         introCopy.current.style.transform = `translate3d(${-copyExit * 120}vw, -50%, 0)`;
       }
+      updatePortal(progress);
     };
 
-    const draw = (time: number) => {
+    const draw = () => {
       if (visible) {
-        if (model && !reduceMotion) {
-          pivot.position.y = Math.sin(time * 0.00055) * 0.015;
-        }
         renderer.render(scene, camera);
       }
       frame = requestAnimationFrame(draw);
     };
-
-    const textureCanvas = createHomepageTexture();
-    if (textureCanvas) {
-      homepageTexture = new THREE.CanvasTexture(textureCanvas);
-      homepageTexture.colorSpace = THREE.SRGBColorSpace;
-      homepageTexture.flipY = false;
-      homepageTexture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
-    }
 
     const loader = new GLTFLoader();
     loader.load(
@@ -167,32 +215,40 @@ export function MacbookIntro() {
         model.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
           object.frustumCulled = true;
+          object.geometry.computeBoundingBox();
+          const geometrySize = object.geometry.boundingBox?.getSize(new THREE.Vector3());
+          const isStructural = geometrySize ? Math.max(geometrySize.x, geometrySize.y, geometrySize.z) > 0.2 : false;
           const materials = Array.isArray(object.material) ? object.material : [object.material];
           materials.forEach((sourceMaterial, index) => {
             const material = sourceMaterial.clone();
             if (Array.isArray(object.material)) object.material[index] = material;
             else object.material = material;
-            const isScreen = material.name === "HlQwFCAPWzetDQy" ||
-              (material instanceof THREE.MeshStandardMaterial && Boolean(material.emissiveMap));
-            if (isScreen && homepageTexture) {
+            const isScreen = material.name === "HlQwFCAPWzetDQy";
+            if (isScreen) {
+              screenMesh = object;
               const screenMaterial = new THREE.MeshBasicMaterial({
-                map: homepageTexture,
-                toneMapped: false,
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                colorWrite: false,
               });
               material.dispose();
               if (Array.isArray(object.material)) object.material[index] = screenMaterial;
               else object.material = screenMaterial;
               return;
             }
+            if (material.name === "KtCwfhzYtafEPLg") {
+              object.visible = false;
+              return;
+            }
             if (
               material instanceof THREE.MeshStandardMaterial &&
-              !material.transparent &&
-              material.opacity > 0.98 &&
-              material.metalness > 0.35
+              (isStructural || material.metalness > 0.35)
             ) {
-              material.color.setHex(0x080808);
-              material.metalness = Math.max(material.metalness, 0.82);
-              material.roughness = Math.max(0.25, Math.min(material.roughness, 0.42));
+              material.color.setHex(0x343436);
+              material.metalness = Math.max(material.metalness, 0.76);
+              material.roughness = Math.max(0.22, Math.min(material.roughness, 0.3));
+              material.envMapIntensity = 2.2;
               material.needsUpdate = true;
             }
           });
@@ -202,14 +258,15 @@ export function MacbookIntro() {
         const size = bounds.getSize(new THREE.Vector3());
         const center = bounds.getCenter(new THREE.Vector3());
         model.position.sub(center);
-        const scale = 3.25 / Math.max(size.x, size.y, size.z);
+        const scale = 3.55 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         pivot.add(model);
+        updateProgress();
         section.current?.setAttribute("data-model-ready", "true");
         window.dispatchEvent(new Event("dhrex:model-ready"));
       },
       undefined,
-      () => section.current?.setAttribute("data-model-error", "true"),
+      () => activateFallback(),
     );
 
     const observer = new IntersectionObserver(
@@ -230,7 +287,12 @@ export function MacbookIntro() {
       observer.disconnect();
       window.removeEventListener("resize", renderSize);
       window.removeEventListener("scroll", updateProgress);
-      homepageTexture?.dispose();
+      if (workIndex) {
+        workIndex.inert = false;
+        workIndex.style.removeProperty("clip-path");
+        delete workIndex.dataset.portalLive;
+      }
+      studioEnvironment.dispose();
       scene.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         object.geometry.dispose();
