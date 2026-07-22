@@ -65,6 +65,9 @@ export function MacbookIntro() {
       if (workIndex) {
         workIndex.inert = false;
         workIndex.style.removeProperty("clip-path");
+        workIndex.style.removeProperty("border-radius");
+        workIndex.style.removeProperty("transform");
+        workIndex.style.removeProperty("transform-origin");
       }
       window.dispatchEvent(new Event("dhrex:model-ready"));
     };
@@ -81,6 +84,7 @@ export function MacbookIntro() {
     if (workIndex) {
       workIndex.inert = true;
       workIndex.style.clipPath = "inset(50%)";
+      workIndex.style.transformOrigin = "top left";
     }
     let renderer: THREE.WebGLRenderer;
     try {
@@ -176,7 +180,11 @@ export function MacbookIntro() {
       const portalRight = THREE.MathUtils.lerp(right, 100, portalProgress);
       const portalTop = THREE.MathUtils.lerp(top, 0, portalProgress);
       const portalBottom = THREE.MathUtils.lerp(bottom, 100, portalProgress);
-      workIndex.style.clipPath = `polygon(${portalLeft}% ${portalTop}%, ${portalRight}% ${portalTop}%, ${portalRight}% ${portalBottom}%, ${portalLeft}% ${portalBottom}%)`;
+      const portalWidth = Math.max(portalRight - portalLeft, 0.01);
+      const portalHeight = Math.max(portalBottom - portalTop, 0.01);
+      workIndex.style.clipPath = "inset(0)";
+      workIndex.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
+      workIndex.style.transform = `translate3d(${portalLeft}vw, ${portalTop}vh, 0) scale(${portalWidth / 100}, ${portalHeight / 100})`;
       const live = revealProgress >= 0.9;
       workIndex.inert = !live;
       workIndex.dataset.portalLive = live ? "true" : "false";
@@ -290,6 +298,9 @@ export function MacbookIntro() {
       if (workIndex) {
         workIndex.inert = false;
         workIndex.style.removeProperty("clip-path");
+        workIndex.style.removeProperty("border-radius");
+        workIndex.style.removeProperty("transform");
+        workIndex.style.removeProperty("transform-origin");
         delete workIndex.dataset.portalLive;
       }
       studioEnvironment.dispose();

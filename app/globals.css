@@ -1914,8 +1914,9 @@ body[data-scrolled="true"] .site-header {
   z-index: 5;
   top: 0;
   min-height: 100svh;
+  overflow: hidden;
   pointer-events: none;
-  will-change: clip-path;
+  will-change: transform;
 }
 
 .home-entry > .work-index[data-portal-live="true"] {
@@ -2050,7 +2051,9 @@ body[data-scrolled="true"] .site-header {
 .home-entry[data-simplified="true"] > .work-index {
   position: relative;
   clip-path: none !important;
+  border-radius: 0 !important;
   pointer-events: auto;
+  transform: none !important;
   will-change: auto;
 }
 
@@ -2712,7 +2715,9 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   .home-entry > .work-index {
     position: relative;
     clip-path: none !important;
+    border-radius: 0 !important;
     pointer-events: auto;
+    transform: none !important;
     will-change: auto;
   }
 
