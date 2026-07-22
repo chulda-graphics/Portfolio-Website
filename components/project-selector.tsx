@@ -19,7 +19,7 @@ export function ProjectSelector() {
 
     const interval = window.setInterval(() => {
       setActiveIndex((index) => (index + 1) % projects.length);
-    }, 4200);
+    }, 5200);
 
     return () => window.clearInterval(interval);
   }, [userIsChoosing, autoRotate]);
@@ -44,10 +44,21 @@ export function ProjectSelector() {
 
   const preview = (
     <div className="project-preview-card" key={activeProject.index}>
-      <img src={activeProject.cover} alt={activeProject.alt} />
+      <picture>
+        <source srcSet={activeProject.coverAvif} type="image/avif" />
+        <img
+          src={activeProject.cover}
+          alt={activeProject.alt}
+          width={activeProject.width}
+          height={activeProject.height}
+          loading={activeIndex === 0 ? "eager" : "lazy"}
+          fetchPriority={activeIndex === 0 ? "high" : "auto"}
+          decoding="async"
+        />
+      </picture>
       <div className="project-preview-shade" />
       <div className="project-preview-meta">
-        <span>{activeProject.index} / 10</span>
+        <span>{activeProject.index} / {String(projects.length).padStart(2, "0")}</span>
         <span>{status}</span>
       </div>
       <div className="project-preview-title">
@@ -81,13 +92,14 @@ export function ProjectSelector() {
         </button>
       </div>
 
-      <div className="preview-orbit" aria-live="polite">
+      <div className="preview-orbit" aria-live={userIsChoosing ? "polite" : "off"}>
         <span className="orbit-line orbit-line-one" aria-hidden="true" />
         <span className="orbit-line orbit-line-two" aria-hidden="true" />
         {activeProject.href ? (
           <Link
             className="project-preview-link"
             href={activeProject.href}
+            data-cursor="view"
             aria-label={`View ${activeProject.title} case study`}
           >
             {preview}

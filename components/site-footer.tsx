@@ -1,4 +1,11 @@
-import Link from "next/link";
+import { BookingButton } from "./booking-button";
+
+const socialLinks = [
+  ["Instagram", "https://www.instagram.com/dhrex.in.motion/"],
+  ["TikTok", "https://www.tiktok.com/@dhrex.in.motion"],
+  ["LinkedIn", "https://www.linkedin.com/in/dhrex-ca%C3%B1ezo/"],
+  ["X", "https://x.com/dhrexinmotion"],
+];
 
 export function SiteFooter() {
   return (
@@ -7,17 +14,14 @@ export function SiteFooter() {
         <span className="availability-dot" aria-hidden="true" />
         Available for freelance projects
       </div>
-      <nav aria-label="Footer navigation">
-        <Link href="/about">About</Link>
-        <Link href="/contact">Contact</Link>
-        <a
-          href="https://calendly.com/chulda-graphics2022/30min"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Schedule a call ↗
-        </a>
+      <nav aria-label="Social links">
+        {socialLinks.map(([label, href]) => (
+          <a href={href} target="_blank" rel="noreferrer" key={label}>
+            {label} ↗
+          </a>
+        ))}
       </nav>
+      <BookingButton className="footer-booking">Schedule a call</BookingButton>
       <p>© {new Date().getFullYear()} Dhrex</p>
     </footer>
   );

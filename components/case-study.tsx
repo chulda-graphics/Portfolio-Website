@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { CaseStudyVideo } from "./case-study-video";
+import { FramePreview } from "./frame-preview";
+import { HorizontalCaseStudy } from "./horizontal-case-study";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -21,6 +23,7 @@ type CaseStudyProps = {
   summary: string;
   video: string;
   poster: string;
+  frames: string[];
   details: Detail[];
   sections: Section[];
   testimonial?: {
@@ -41,6 +44,7 @@ export function CaseStudy({
   summary,
   video,
   poster,
+  frames,
   details,
   sections,
   testimonial,
@@ -50,25 +54,28 @@ export function CaseStudy({
     <main id="main-content">
       <SiteHeader />
       <article className="case-study">
-        <header className="case-hero">
-          <p className="eyebrow">{eyebrow}</p>
-          <h1>{title}</h1>
-          <p className="case-summary">{summary}</p>
-          <dl className="case-details">
-            {details.map((detail) => (
-              <div key={detail.label}>
-                <dt>{detail.label}</dt>
-                <dd>{detail.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </header>
+        <HorizontalCaseStudy>
+          <header className="case-panel case-hero">
+            <p className="eyebrow">{eyebrow}</p>
+            <h1>{title}</h1>
+            <p className="case-summary">{summary}</p>
+            <dl className="case-details">
+              {details.map((detail) => (
+                <div key={detail.label}>
+                  <dt>{detail.label}</dt>
+                  <dd>{detail.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="case-scroll-cue">Scroll to move through the case study <span aria-hidden="true">→</span></p>
+          </header>
 
-        <CaseStudyVideo src={video} poster={poster} title={title} />
+          <div className="case-panel case-film-panel">
+            <CaseStudyVideo src={video} poster={poster} title={title} />
+          </div>
 
-        <div className="case-sections">
           {sections.map((section) => (
-            <section key={section.number} className="case-section">
+            <section key={section.number} className="case-panel case-section">
               <div className="case-section-index">
                 <span>{section.number}</span>
                 <span>{section.label}</span>
@@ -81,25 +88,28 @@ export function CaseStudy({
               </div>
             </section>
           ))}
-        </div>
 
-        {testimonial ? (
-          <figure className="testimonial">
-            <blockquote>“{testimonial.quote}”</blockquote>
-            <figcaption>
-              <span>{testimonial.name}</span>
-              <a href={testimonial.companyUrl} target="_blank" rel="noreferrer">
-                {testimonial.role} ↗
-              </a>
-            </figcaption>
-          </figure>
-        ) : null}
+          <FramePreview title={title} frames={frames} />
 
-        <Link className="next-project" href={nextProject.href}>
-          <span>Next case study</span>
-          <strong>{nextProject.title}</strong>
-          <span aria-hidden="true">↗</span>
-        </Link>
+          {testimonial ? (
+            <figure className="case-panel testimonial">
+              <p className="eyebrow">Client perspective</p>
+              <blockquote>“{testimonial.quote}”</blockquote>
+              <figcaption>
+                <span>{testimonial.name}</span>
+                <a href={testimonial.companyUrl} target="_blank" rel="noreferrer">
+                  {testimonial.role} ↗
+                </a>
+              </figcaption>
+            </figure>
+          ) : null}
+
+          <Link className="case-panel next-project" href={nextProject.href} data-cursor="Next">
+            <span>Next case study</span>
+            <strong>{nextProject.title}</strong>
+            <span aria-hidden="true">↗</span>
+          </Link>
+        </HorizontalCaseStudy>
       </article>
       <SiteFooter />
     </main>

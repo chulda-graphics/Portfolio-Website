@@ -14,7 +14,11 @@ export default function StillSearchCaseStudy() {
       title="StillSearch"
       summary="Making a better visual-search experience immediately understandable to the filmmakers it was built for."
       video="https://pub-8843028733224946913b21df4054c3ae.r2.dev/StillSearch%20Launch%20Video.mp4"
-      poster="/assets/stillsearch-cover.png"
+      poster="/assets/stillsearch-cover-v1.webp"
+      frames={Array.from(
+        { length: 20 },
+        (_, index) => `/frames/stillsearch-v1/frame-${String(index + 1).padStart(2, "0")}.webp`,
+      )}
       details={[
         { label: "Client", value: "StillSearch" },
         { label: "Role", value: "Motion design, UI recreation" },

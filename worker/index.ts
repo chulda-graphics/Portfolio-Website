@@ -4,7 +4,6 @@ import handler from "vinext/server/app-router-entry";
 
 interface Env {
   ASSETS: Fetcher;
-  DB: D1Database;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -12,6 +11,34 @@ interface Env {
       };
     };
   };
+}
+
+const IMMUTABLE_ASSET = /^\/(?:assets|fonts|frames|models)\/|^\/og-v\d+\.(?:avif|jpe?g|png|webp)$/i;
+
+function applyDeliveryHeaders(request: Request, response: Response) {
+  const headers = new Headers(response.headers);
+  const url = new URL(request.url);
+  const contentType = headers.get("content-type") ?? "";
+
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+  if ((request.method === "GET" || request.method === "HEAD") && response.ok) {
+    if (IMMUTABLE_ASSET.test(url.pathname)) {
+      headers.set("Cache-Control", "public, max-age=31536000, immutable");
+      headers.set("CDN-Cache-Control", "public, max-age=31536000, immutable");
+    } else if (contentType.toLowerCase().startsWith("text/html")) {
+      headers.set("Cache-Control", "public, max-age=0, must-revalidate");
+      headers.set("CDN-Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    }
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 interface ExecutionContext {
@@ -31,16 +58,18 @@ const worker = {
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
-      return handleImageOptimization(request, {
+      const response = await handleImageOptimization(request, {
         fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
           const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
           return result.response();
         },
       }, allowedWidths);
+      return applyDeliveryHeaders(request, response);
     }
 
-    return handler.fetch(request, env, ctx);
+    const response = await handler.fetch(request, env, ctx);
+    return applyDeliveryHeaders(request, response);
   },
 };
 

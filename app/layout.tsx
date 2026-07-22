@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import { MotionSystem } from "@/components/motion-system";
 import "./globals.css";
 
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-  display: "swap",
-});
+export const viewport: Viewport = {
+  themeColor: "#050505",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
 
 async function getRequestOrigin() {
   const requestHeaders = await headers();
@@ -18,7 +19,7 @@ async function getRequestOrigin() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const origin = await getRequestOrigin();
-  const socialImage = `${origin}/og.png`;
+  const socialImage = `${origin}/og-v2.jpg`;
 
   return {
     metadataBase: new URL(origin),
@@ -46,8 +47,8 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: socialImage,
-          width: 1536,
-          height: 878,
+          width: 1200,
+          height: 630,
           alt: "Dhrex — Clarity, set in motion.",
         },
       ],
@@ -129,7 +130,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={geist.variable}>
+      <head>
+        <link rel="preconnect" href="https://pub-8843028733224946913b21df4054c3ae.r2.dev" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//pub-8843028733224946913b21df4054c3ae.r2.dev" />
+      </head>
+      <body>
+        <MotionSystem />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

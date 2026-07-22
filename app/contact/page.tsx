@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactForm } from "@/components/contact-form";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -34,27 +35,7 @@ export default function ContactPage() {
           </p>
         </header>
 
-        <section className="contact-actions" aria-label="Contact options">
-          <a
-            className="primary-contact"
-            href="https://calendly.com/chulda-graphics2022/30min"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Schedule a discovery call, opens in a new tab"
-          >
-            <span>Primary</span>
-            <strong>Schedule a discovery call</strong>
-            <span aria-hidden="true">↗</span>
-          </a>
-          <a
-            className="secondary-contact"
-            href="mailto:chulda.graphics2022@gmail.com"
-          >
-            <span>Email</span>
-            <strong>chulda.graphics2022@gmail.com</strong>
-            <span aria-hidden="true">↗</span>
-          </a>
-        </section>
+        <ContactForm />
 
         <section className="socials" aria-labelledby="socials-title">
           <h2 id="socials-title">Follow the work</h2>

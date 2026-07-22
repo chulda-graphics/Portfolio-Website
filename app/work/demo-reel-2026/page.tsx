@@ -14,7 +14,11 @@ export default function DemoReelCaseStudy() {
       title="Demo Reel 2026"
       summary="A compact statement of how I think in motion: clarity first, rhythm with purpose, and craft down to the frame."
       video="https://pub-8843028733224946913b21df4054c3ae.r2.dev/Video%20Demo%20Reel%202026.mp4"
-      poster="/assets/demo-reel-cover.png"
+      poster="/assets/demo-reel-cover-v1.webp"
+      frames={Array.from(
+        { length: 20 },
+        (_, index) => `/frames/demo-reel-v1/frame-${String(index + 1).padStart(2, "0")}.webp`,
+      )}
       details={[
         { label: "Role", value: "Direction, design, animation, edit" },
         { label: "Scope", value: "Personal showcase" },

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render(pathname = "/") {
@@ -35,6 +36,9 @@ for (const [route, expectation] of routes) {
     const response = await render(route);
     assert.equal(response.status, 200);
     assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.match(response.headers.get("cache-control") ?? "", /must-revalidate/);
+    assert.match(response.headers.get("cdn-cache-control") ?? "", /stale-while-revalidate/);
 
     const html = await response.text();
     assert.match(html, expectation);
@@ -48,4 +52,12 @@ test("coming-soon work remains inert", async () => {
   const html = await response.text();
   assert.match(html, /Coming Soon/);
   assert.doesNotMatch(html, /href=["'][^"']*coming-soon/i);
+});
+
+test("Cloudflare image and asset bindings are emitted", async () => {
+  const config = JSON.parse(
+    await readFile(new URL("../dist/server/wrangler.json", import.meta.url), "utf8"),
+  );
+  assert.equal(config.assets?.binding, "ASSETS");
+  assert.equal(config.images?.binding, "IMAGES");
 });

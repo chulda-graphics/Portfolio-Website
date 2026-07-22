@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { BookingButton } from "./booking-button";
 
 const navigation = [
   { href: "/", label: "Works" },
@@ -15,10 +16,6 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     document.body.dataset.menuOpen = open ? "true" : "false";
@@ -44,7 +41,7 @@ export function SiteHeader() {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <Link className="wordmark" href="/" aria-label="Dhrex, work index">
+      <Link className="wordmark" href="/" aria-label="Dhrex, work index" onClick={() => setOpen(false)}>
         Dhrex
       </Link>
 
@@ -59,6 +56,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
+              onClick={() => setOpen(false)}
             >
               {item.label}
             </Link>
@@ -66,15 +64,13 @@ export function SiteHeader() {
         })}
       </nav>
 
-      <a
+      <BookingButton
         className="header-cta"
-        href="https://calendly.com/chulda-graphics2022/30min"
-        target="_blank"
-        rel="noreferrer"
+        data-cursor="Book"
       >
         <span className="availability-dot" aria-hidden="true" />
         Book a call
-      </a>
+      </BookingButton>
 
       <button
         ref={toggleRef}
@@ -98,7 +94,12 @@ export function SiteHeader() {
       >
         <nav aria-label="Mobile navigation">
           {navigation.map((item, index) => (
-            <Link href={item.href} key={item.href} tabIndex={open ? 0 : -1}>
+            <Link
+              href={item.href}
+              key={item.href}
+              tabIndex={open ? 0 : -1}
+              onClick={() => setOpen(false)}
+            >
               <span>{String(index + 1).padStart(2, "0")}</span>
               {item.label}
             </Link>
@@ -108,6 +109,7 @@ export function SiteHeader() {
           <p>Remote worldwide</p>
           <p>Available for freelance</p>
         </div>
+        <BookingButton className="mobile-booking-button">Schedule a discovery call</BookingButton>
       </div>
     </header>
   );
