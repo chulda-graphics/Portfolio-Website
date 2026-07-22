@@ -24,28 +24,41 @@ function createHomepageTexture() {
 
   context.fillStyle = "#050505";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.strokeStyle = "rgba(255,255,255,.18)";
-  context.lineWidth = 2;
-  context.strokeRect(66, 68, 1468, 864);
   context.fillStyle = "#f5f5f2";
-  context.font = "600 42px 'DM Sans', sans-serif";
-  context.fillText("DHREX", 112, 145);
+  context.font = "600 34px 'DM Sans', sans-serif";
+  context.fillText("Dhrex", 80, 92);
   context.fillStyle = "#888884";
-  context.font = "500 24px 'DM Sans', sans-serif";
-  context.fillText("SAAS MOTION DESIGNER", 112, 202);
+  context.font = "500 17px 'DM Sans', sans-serif";
+  context.fillText("WORK     ABOUT     CONTACT", 1210, 88);
   context.fillStyle = "#f5f5f2";
-  context.font = "500 122px 'DM Sans', sans-serif";
-  context.fillText("CLARITY,", 112, 480);
-  context.fillText("SET IN MOTION.", 112, 610);
+  context.font = "500 102px 'DM Sans', sans-serif";
+  context.fillText("CLARITY,", 80, 350);
+  context.fillText("SET IN MOTION.", 80, 454);
+  context.strokeStyle = "rgba(255,255,255,.22)";
+  context.lineWidth = 2;
+  context.strokeRect(890, 170, 620, 560);
+  context.fillStyle = "#141414";
+  context.fillRect(906, 186, 588, 528);
+  context.strokeStyle = "rgba(255,255,255,.12)";
+  for (let line = 0; line < 6; line += 1) {
+    const y = 250 + line * 68;
+    context.beginPath();
+    context.moveTo(954, y);
+    context.lineTo(1444, y);
+    context.stroke();
+  }
+  context.fillStyle = "#f5f5f2";
+  context.font = "500 30px 'DM Sans', sans-serif";
+  context.fillText("DEMO REEL 2026", 938, 665);
   context.strokeStyle = "rgba(255,255,255,.28)";
   context.beginPath();
-  context.moveTo(112, 760);
-  context.lineTo(1488, 760);
+  context.moveTo(80, 850);
+  context.lineTo(1520, 850);
   context.stroke();
   context.fillStyle = "#8e8e89";
-  context.font = "500 25px 'DM Sans', sans-serif";
-  context.fillText("PRODUCT MOTION / LAUNCH FILMS / UI ANIMATION", 112, 828);
-  context.fillText("REMOTE WORLDWIDE", 1210, 828);
+  context.font = "500 20px 'DM Sans', sans-serif";
+  context.fillText("PRODUCT MOTION / LAUNCH FILMS / UI ANIMATION", 80, 902);
+  context.fillText("REMOTE WORLDWIDE", 1320, 902);
   return canvas;
 }
 
@@ -53,7 +66,6 @@ export function MacbookIntro() {
   const section = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const introCopy = useRef<HTMLDivElement>(null);
-  const portalCopy = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!section.current || !canvas.current) return;
@@ -78,17 +90,17 @@ export function MacbookIntro() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(33, 1, 0.01, 100);
-    camera.position.set(3.9, 2.25, 5.4);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0.15, 1.05, 7.2);
+    camera.lookAt(0, 0.25, 0);
 
     const pivot = new THREE.Group();
-    pivot.rotation.set(-0.03, -0.25, -0.015);
+    pivot.rotation.set(-0.025, -0.08, 0);
     scene.add(pivot);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x101010, 2.15));
     const keyLight = new THREE.DirectionalLight(0xffffff, 5.2);
     keyLight.position.set(3.5, 5, 4);
     scene.add(keyLight);
-    const rimLight = new THREE.DirectionalLight(0x9ba7ff, 2.1);
+    const rimLight = new THREE.DirectionalLight(0xd8d8d2, 1.7);
     rimLight.position.set(-4, 2, -2);
     scene.add(rimLight);
 
@@ -113,18 +125,19 @@ export function MacbookIntro() {
       const distance = Math.max(section.current.offsetHeight - window.innerHeight, 1);
       progress = clamp(-rect.top / distance);
       const eased = easeInOut(progress);
-      camera.position.x = THREE.MathUtils.lerp(3.9, 0.25, eased);
-      camera.position.y = THREE.MathUtils.lerp(2.25, 0.12, eased);
-      camera.position.z = THREE.MathUtils.lerp(5.4, 2.25, eased);
-      camera.lookAt(0, THREE.MathUtils.lerp(0, 0.18, eased), 0);
-      pivot.rotation.y = THREE.MathUtils.lerp(-0.25, -0.015, eased);
+      camera.position.x = THREE.MathUtils.lerp(0.15, 0, eased);
+      camera.position.y = THREE.MathUtils.lerp(1.05, -0.05, eased);
+      camera.position.z = THREE.MathUtils.lerp(7.2, 1.35, eased);
+      camera.lookAt(
+        0,
+        THREE.MathUtils.lerp(0.25, 0.35, eased),
+        THREE.MathUtils.lerp(0, 0.05, eased),
+      );
+      pivot.rotation.y = THREE.MathUtils.lerp(-0.08, 0, eased);
       pivot.rotation.x = THREE.MathUtils.lerp(-0.03, 0, eased);
-      const modelOpacity = 1 - clamp((progress - 0.74) / 0.18);
-      canvas.current.style.opacity = String(modelOpacity);
-      if (introCopy.current) introCopy.current.style.opacity = String(1 - clamp(progress / 0.2));
-      if (portalCopy.current) {
-        portalCopy.current.style.opacity = String(clamp((progress - 0.68) / 0.18));
-        portalCopy.current.style.transform = `translate3d(0, ${18 - clamp((progress - 0.66) / 0.2) * 18}px, 0)`;
+      if (introCopy.current) {
+        const copyExit = easeInOut(clamp(progress / 0.24));
+        introCopy.current.style.transform = `translate3d(${-copyExit * 120}vw, -50%, 0)`;
       }
     };
 
@@ -155,16 +168,33 @@ export function MacbookIntro() {
           if (!(object instanceof THREE.Mesh)) return;
           object.frustumCulled = true;
           const materials = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach((material, index) => {
+          materials.forEach((sourceMaterial, index) => {
+            const material = sourceMaterial.clone();
+            if (Array.isArray(object.material)) object.material[index] = material;
+            else object.material = material;
             const isScreen = material.name === "HlQwFCAPWzetDQy" ||
               (material instanceof THREE.MeshStandardMaterial && Boolean(material.emissiveMap));
-            if (!isScreen || !homepageTexture) return;
-            const screenMaterial = new THREE.MeshBasicMaterial({
-              map: homepageTexture,
-              toneMapped: false,
-            });
-            if (Array.isArray(object.material)) object.material[index] = screenMaterial;
-            else object.material = screenMaterial;
+            if (isScreen && homepageTexture) {
+              const screenMaterial = new THREE.MeshBasicMaterial({
+                map: homepageTexture,
+                toneMapped: false,
+              });
+              material.dispose();
+              if (Array.isArray(object.material)) object.material[index] = screenMaterial;
+              else object.material = screenMaterial;
+              return;
+            }
+            if (
+              material instanceof THREE.MeshStandardMaterial &&
+              !material.transparent &&
+              material.opacity > 0.98 &&
+              material.metalness > 0.35
+            ) {
+              material.color.setHex(0x080808);
+              material.metalness = Math.max(material.metalness, 0.82);
+              material.roughness = Math.max(0.25, Math.min(material.roughness, 0.42));
+              material.needsUpdate = true;
+            }
           });
         });
 
@@ -172,7 +202,7 @@ export function MacbookIntro() {
         const size = bounds.getSize(new THREE.Vector3());
         const center = bounds.getCenter(new THREE.Vector3());
         model.position.sub(center);
-        const scale = 3.9 / Math.max(size.x, size.y, size.z);
+        const scale = 3.25 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         pivot.add(model);
         section.current?.setAttribute("data-model-ready", "true");
@@ -220,10 +250,6 @@ export function MacbookIntro() {
           <span>Scroll to enter</span>
         </div>
         <canvas ref={canvas} aria-hidden="true" />
-        <div ref={portalCopy} className="macbook-portal-copy" aria-hidden="true">
-          <span>Inside the work</span>
-          <strong>Clarity,<br />set in motion.</strong>
-        </div>
         <div className="model-fallback" aria-hidden="true">
           <span>Dhrex</span>
           <strong>Clarity,<br />set in motion.</strong>

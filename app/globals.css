@@ -1674,9 +1674,9 @@ p {
   top: 0;
   left: 0;
   display: grid;
-  width: 3.15rem;
-  height: 3.15rem;
-  margin: -1.575rem 0 0 -1.575rem;
+  width: 2.65rem;
+  height: 2.65rem;
+  margin: -1.325rem 0 0 -1.325rem;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: 50%;
@@ -1698,9 +1698,9 @@ p {
 }
 
 .custom-cursor[data-active="true"] {
-  width: 4.5rem;
-  height: 4.5rem;
-  margin: -2.25rem 0 0 -2.25rem;
+  width: 3.85rem;
+  height: 3.85rem;
+  margin: -1.925rem 0 0 -1.925rem;
   border-color: var(--white);
   background: rgba(244, 244, 241, 0.94);
   color: var(--ink);
@@ -1716,6 +1716,19 @@ p {
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 901px) {
+  html,
+  body,
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    cursor: none !important;
+  }
 }
 
 /* Navigation */
@@ -1856,7 +1869,6 @@ body[data-scrolled="true"] .site-header {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 800ms ease;
 }
 
 .macbook-intro[data-model-ready="true"] canvas {
@@ -1864,7 +1876,6 @@ body[data-scrolled="true"] .site-header {
 }
 
 .macbook-intro-copy,
-.macbook-portal-copy,
 .model-fallback {
   position: absolute;
   z-index: 2;
@@ -1902,29 +1913,6 @@ body[data-scrolled="true"] .site-header {
   height: 1px;
   background: currentColor;
   content: "";
-}
-
-.macbook-portal-copy {
-  right: var(--page-pad);
-  bottom: 10vh;
-  opacity: 0;
-  text-align: right;
-}
-
-.macbook-portal-copy span {
-  color: #777772;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.macbook-portal-copy strong {
-  display: block;
-  margin-top: 1rem;
-  font-size: clamp(3.2rem, 7vw, 8rem);
-  font-weight: 470;
-  letter-spacing: -0.05em;
-  line-height: 0.88;
 }
 
 .model-fallback {
@@ -2093,9 +2081,10 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   border-right: 1px solid var(--line);
 }
 
-.case-hero.case-panel {
+.case-hero {
   display: grid;
   width: 100vw;
+  min-height: 100svh;
   grid-template-columns: minmax(0, 1.5fr) minmax(20rem, 0.6fr);
   grid-template-rows: auto 1fr auto;
   gap: 2rem 5vw;
@@ -2138,8 +2127,6 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transform: rotate(90deg) translateX(50%);
-  transform-origin: right center;
 }
 
 .case-scroll-cue span {
@@ -2149,6 +2136,7 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 .case-film-panel {
   display: grid;
   width: 100vw;
+  min-height: 100svh;
   padding: 7rem var(--page-pad) 3rem;
   place-items: center;
 }
@@ -2183,7 +2171,10 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 
 /* Interactive frame preview */
 .frame-preview {
+  position: relative;
   width: 100vw;
+  min-height: 100svh;
+  overflow: hidden;
   padding: 7rem var(--page-pad) 4rem;
   background:
     radial-gradient(circle at 70% 45%, rgba(255, 255, 255, 0.055), transparent 32%),
@@ -2256,6 +2247,38 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   letter-spacing: 0.08em;
 }
 
+.frame-echoes {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.frame-echo {
+  --echo-x: 68vw;
+  --echo-y: 55vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(43vw, 43rem);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.35rem;
+  background: #111;
+  box-shadow: 0 1.5rem 4.5rem rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  transform: translate3d(calc(var(--echo-x) - 50%), calc(var(--echo-y) - 50%), 0);
+  will-change: transform, opacity;
+}
+
+.frame-echo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .frame-touch-rail {
   display: none;
 }
@@ -2281,22 +2304,16 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   transform: scaleY(3);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .frame-preview {
-    cursor: none;
-  }
-}
-
-/* Compact testimonial and next project */
-.testimonial.case-panel {
+/* Case-study closing sections */
+.case-study > .testimonial {
   display: flex;
-  width: min(72vw, 74rem);
+  min-height: 82svh;
   flex-direction: column;
   justify-content: center;
   padding: 7rem clamp(2rem, 6vw, 7rem);
 }
 
-.testimonial.case-panel blockquote {
+.case-study > .testimonial blockquote {
   max-width: 26ch;
   margin: 2.4rem 0 4rem;
   font-size: clamp(1.8rem, 3.1vw, 3.5rem);
@@ -2305,17 +2322,23 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
   line-height: 1.15;
 }
 
-.testimonial.case-panel figcaption {
+.case-study > .testimonial figcaption {
   color: #8a8a85;
 }
 
-.next-project.case-panel {
+.case-study > .next-project {
   width: 100vw;
   min-height: 100svh;
   background: #070707;
+  color: var(--white);
 }
 
-.next-project.case-panel strong {
+.case-study > .next-project:hover {
+  background: #101010;
+  color: var(--white);
+}
+
+.case-study > .next-project strong {
   letter-spacing: -0.052em;
 }
 
@@ -2601,10 +2624,10 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     scroll-snap-align: start;
   }
 
-  .case-hero.case-panel,
+  .case-hero,
   .case-film-panel,
   .frame-preview,
-  .next-project.case-panel {
+  .next-project {
     width: 100vw;
   }
 
@@ -2627,6 +2650,10 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     margin-top: 3rem;
     opacity: 1;
     transform: none !important;
+  }
+
+  .frame-echoes {
+    display: none;
   }
 
   .frame-touch-rail {
@@ -2664,8 +2691,8 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     bottom: 2rem;
   }
 
-  .testimonial.case-panel {
-    width: 84vw;
+  .case-study > .testimonial {
+    width: 100vw;
   }
 }
 
@@ -2702,17 +2729,11 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     width: 88vw;
   }
 
-  .macbook-portal-copy {
-    right: var(--page-pad);
-    bottom: 5rem;
-    left: var(--page-pad);
-  }
-
   .work-index {
     border-top: 1px solid var(--line);
   }
 
-  .case-hero.case-panel {
+  .case-hero {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -2767,12 +2788,12 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     font-size: clamp(3.6rem, 15vw, 5.8rem);
   }
 
-  .testimonial.case-panel {
-    width: 94vw;
+  .case-study > .testimonial {
+    width: 100vw;
     padding: 5rem 2rem;
   }
 
-  .testimonial.case-panel blockquote {
+  .case-study > .testimonial blockquote {
     font-size: clamp(1.8rem, 7.5vw, 2.8rem);
   }
 

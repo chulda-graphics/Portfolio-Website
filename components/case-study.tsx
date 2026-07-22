@@ -54,26 +54,26 @@ export function CaseStudy({
     <main id="main-content">
       <SiteHeader />
       <article className="case-study">
+        <header className="case-hero">
+          <p className="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p className="case-summary">{summary}</p>
+          <dl className="case-details">
+            {details.map((detail) => (
+              <div key={detail.label}>
+                <dt>{detail.label}</dt>
+                <dd>{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="case-scroll-cue">Scroll to explore the case study <span aria-hidden="true">↓</span></p>
+        </header>
+
+        <div className="case-film-panel">
+          <CaseStudyVideo src={video} poster={poster} title={title} />
+        </div>
+
         <HorizontalCaseStudy>
-          <header className="case-panel case-hero">
-            <p className="eyebrow">{eyebrow}</p>
-            <h1>{title}</h1>
-            <p className="case-summary">{summary}</p>
-            <dl className="case-details">
-              {details.map((detail) => (
-                <div key={detail.label}>
-                  <dt>{detail.label}</dt>
-                  <dd>{detail.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="case-scroll-cue">Scroll to move through the case study <span aria-hidden="true">→</span></p>
-          </header>
-
-          <div className="case-panel case-film-panel">
-            <CaseStudyVideo src={video} poster={poster} title={title} />
-          </div>
-
           {sections.map((section) => (
             <section key={section.number} className="case-panel case-section">
               <div className="case-section-index">
@@ -88,28 +88,28 @@ export function CaseStudy({
               </div>
             </section>
           ))}
-
-          <FramePreview title={title} frames={frames} />
-
-          {testimonial ? (
-            <figure className="case-panel testimonial">
-              <p className="eyebrow">Client perspective</p>
-              <blockquote>“{testimonial.quote}”</blockquote>
-              <figcaption>
-                <span>{testimonial.name}</span>
-                <a href={testimonial.companyUrl} target="_blank" rel="noreferrer">
-                  {testimonial.role} ↗
-                </a>
-              </figcaption>
-            </figure>
-          ) : null}
-
-          <Link className="case-panel next-project" href={nextProject.href} data-cursor="Next">
-            <span>Next case study</span>
-            <strong>{nextProject.title}</strong>
-            <span aria-hidden="true">↗</span>
-          </Link>
         </HorizontalCaseStudy>
+
+        <FramePreview title={title} frames={frames} />
+
+        {testimonial ? (
+          <figure className="testimonial">
+            <p className="eyebrow">Client perspective</p>
+            <blockquote>“{testimonial.quote}”</blockquote>
+            <figcaption>
+              <span>{testimonial.name}</span>
+              <a href={testimonial.companyUrl} target="_blank" rel="noreferrer">
+                {testimonial.role} ↗
+              </a>
+            </figcaption>
+          </figure>
+        ) : null}
+
+        <Link className="next-project" href={nextProject.href} data-cursor="Next">
+          <span>Next case study</span>
+          <strong>{nextProject.title}</strong>
+          <span aria-hidden="true">↗</span>
+        </Link>
       </article>
       <SiteFooter />
     </main>
