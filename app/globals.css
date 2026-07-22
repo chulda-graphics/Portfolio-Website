@@ -9,6 +9,393 @@
   --page-pad: clamp(1.25rem, 3.2vw, 3.8rem);
 }
 
+/* Selected-work carousel */
+.work-index {
+  grid-template-columns: minmax(14rem, 0.68fr) minmax(0, 2.32fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  column-gap: clamp(1.5rem, 3.6vw, 5rem);
+  row-gap: 1.25rem;
+}
+
+.project-carousel {
+  position: relative;
+  min-width: 0;
+  height: min(70svh, 52rem);
+  outline: none;
+  perspective: 1500px;
+}
+
+.project-carousel:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 0.65rem;
+}
+
+.carousel-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.carousel-orbit {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: min(80%, 62rem);
+  aspect-ratio: 1.55;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  opacity: 0.78;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotateX(67deg) rotateZ(-6deg);
+}
+
+.project-carousel-item {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(74%, 58rem);
+  aspect-ratio: 16 / 10;
+  opacity: 0.36;
+  filter: brightness(0.58) saturate(0.5);
+  pointer-events: none;
+  transform: translate(-50%, -50%) translateZ(-11rem) scale(0.7);
+  transform-origin: center;
+  transform-style: preserve-3d;
+  transition:
+    left 920ms var(--ease-premium),
+    opacity 720ms ease,
+    filter 920ms ease,
+    transform 920ms var(--ease-premium);
+  will-change: left, transform, opacity;
+}
+
+.project-carousel-item[data-position="previous"] {
+  left: 13%;
+  transform: translate(-50%, -50%) translateZ(-11rem) rotateY(14deg) rotateZ(-1.4deg) scale(0.7);
+}
+
+.project-carousel-item[data-position="next"] {
+  left: 87%;
+  transform: translate(-50%, -50%) translateZ(-11rem) rotateY(-14deg) rotateZ(1.4deg) scale(0.7);
+}
+
+.project-carousel-item[data-position="active"] {
+  z-index: 3;
+  left: 50%;
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) translateZ(2.4rem) scale(1);
+}
+
+.project-carousel-item > a,
+.project-carousel-item > div,
+.project-carousel-item > button {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.project-carousel-item > button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.carousel-card {
+  --card-tilt-x: 0deg;
+  --card-tilt-y: 0deg;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  border-radius: clamp(0.45rem, 0.7vw, 0.8rem);
+  background: #0d0d0d;
+  box-shadow: 0 3.5rem 8rem rgba(0, 0, 0, 0.72);
+  transform: rotateX(var(--card-tilt-y)) rotateY(var(--card-tilt-x));
+  transition: transform 420ms var(--ease-premium), border-color 240ms ease;
+  transform-style: preserve-3d;
+}
+
+.project-carousel-item[data-position="active"] a:hover .carousel-card {
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+.carousel-card picture,
+.carousel-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-card img {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.15s var(--ease-premium), filter 600ms ease;
+}
+
+.project-carousel-item[data-position="active"] a:hover img {
+  transform: scale(1.025);
+}
+
+.carousel-card-shade {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.46), transparent 31%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.78), transparent 40%);
+  pointer-events: none;
+}
+
+.carousel-card.is-coming {
+  background: #dededb;
+}
+
+.carousel-card.is-coming img {
+  padding: 10%;
+  background: linear-gradient(145deg, #f0f0ed, #c9c9c6);
+  filter: grayscale(1) contrast(0.72);
+  object-fit: contain;
+  opacity: 0.72;
+}
+
+.coming-soon-grid {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.055) 1px, transparent 1px);
+  background-size: 2.8rem 2.8rem;
+  mix-blend-mode: multiply;
+}
+
+.carousel-card-topline,
+.carousel-card-title {
+  position: absolute;
+  z-index: 2;
+  right: clamp(1rem, 2vw, 1.7rem);
+  left: clamp(1rem, 2vw, 1.7rem);
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.carousel-card-topline {
+  top: clamp(1rem, 2vw, 1.55rem);
+  font-size: 0.65rem;
+  font-weight: 620;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.carousel-card-title {
+  bottom: clamp(1rem, 2vw, 1.55rem);
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.carousel-card-title span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.72rem;
+}
+
+.carousel-card-title strong {
+  max-width: 75%;
+  font-size: clamp(2.1rem, 4.25vw, 5.4rem);
+  font-weight: 470;
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  text-align: right;
+}
+
+.carousel-card.is-coming .carousel-card-topline,
+.carousel-card.is-coming .carousel-card-title {
+  color: #151515;
+}
+
+.carousel-card.is-coming .carousel-card-title span {
+  color: rgba(5, 5, 5, 0.62);
+}
+
+.carousel-controls {
+  position: absolute;
+  z-index: 5;
+  bottom: 0.1rem;
+  left: 50%;
+  display: flex;
+  gap: 0.45rem;
+  transform: translateX(-50%);
+}
+
+.carousel-controls button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(5, 5, 5, 0.72);
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: border-color 180ms ease, color 180ms ease, transform 300ms var(--ease);
+}
+
+.carousel-controls button:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  color: var(--white);
+  transform: translateY(-0.15rem);
+}
+
+.project-rail {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: end;
+}
+
+.project-rail li {
+  min-width: 0;
+  border-right: 1px solid var(--line);
+}
+
+.project-rail li:last-child {
+  border-right: 0;
+}
+
+.project-rail li > button {
+  display: grid;
+  width: 100%;
+  min-height: 3.7rem;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0 1rem 0 0;
+  border: 0;
+  background: transparent;
+  color: #777773;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  text-align: left;
+  transition: color 220ms ease, padding 420ms var(--ease);
+}
+
+.project-rail li[data-active="true"] > button,
+.project-rail li > button:hover {
+  padding-left: 0.55rem;
+  color: var(--white);
+}
+
+@media (max-width: 1120px) {
+  .work-index {
+    grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 1.7fr);
+  }
+
+  .project-carousel {
+    height: min(61svh, 41rem);
+  }
+
+  .project-carousel-item {
+    width: min(80%, 49rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .work-index {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+    padding-top: 7.5rem;
+  }
+
+  .work-intro h1 {
+    max-width: 7ch;
+  }
+
+  .project-carousel {
+    height: min(64svh, 38rem);
+  }
+
+  .project-carousel-item {
+    width: min(76%, 42rem);
+  }
+
+  .project-rail {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .work-index {
+    gap: 1.2rem;
+    padding-bottom: 2rem;
+  }
+
+  .project-carousel {
+    height: min(60svh, 31rem);
+    margin-inline: calc(var(--page-pad) * -1);
+  }
+
+  .project-carousel-item {
+    width: 82%;
+    aspect-ratio: 4 / 5;
+  }
+
+  .project-carousel-item[data-position="previous"] {
+    left: 5%;
+  }
+
+  .project-carousel-item[data-position="next"] {
+    left: 95%;
+  }
+
+  .carousel-card-title {
+    display: block;
+  }
+
+  .carousel-card-title span {
+    display: block;
+    margin-bottom: 0.45rem;
+  }
+
+  .carousel-card-title strong {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(2.25rem, 12vw, 4rem);
+    text-align: left;
+  }
+
+  .project-rail {
+    display: block;
+  }
+
+  .project-rail li {
+    border-right: 0;
+  }
+
+  .project-rail li > button {
+    min-height: 3.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-carousel-item,
+  .carousel-card,
+  .carousel-card img {
+    transition-duration: 1ms;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1702,19 +2089,19 @@ p {
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
-  transition: transform 400ms var(--ease-premium), visibility 0ms;
+  transition: transform 520ms var(--ease-premium), visibility 0ms;
 }
 
 .route-transition[data-phase="covering"] .route-transition-rail span {
   transform: scaleX(0.72);
-  transition: transform 400ms cubic-bezier(0.2, 0.76, 0.24, 1);
+  transition: transform 520ms cubic-bezier(0.2, 0.76, 0.24, 1);
 }
 
 .route-transition[data-phase="revealing"] {
   visibility: visible;
   pointer-events: auto;
   transform: translateY(-102%);
-  transition: transform 600ms var(--ease-premium), visibility 600ms;
+  transition: transform 720ms var(--ease-premium), visibility 720ms;
 }
 
 .route-transition[data-phase="revealing"] .route-transition-rail span {
@@ -1882,8 +2269,8 @@ body[data-scrolled="true"] .site-header {
 .loading-screen {
   background: #eeeeea;
   transition:
-    transform 680ms var(--ease-premium),
-    visibility 680ms;
+    transform 480ms var(--ease-premium),
+    visibility 480ms;
 }
 
 .loading-screen[data-instant="true"] {
@@ -3034,5 +3421,48 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 
   .site-footer {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Carousel layout authority: kept last to survive legacy selector ordering. */
+@media (min-width: 1121px) {
+  .work-index {
+    grid-template-columns: minmax(14rem, 0.68fr) minmax(0, 2.32fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: clamp(1.5rem, 3.6vw, 5rem);
+    row-gap: 1.25rem;
+  }
+
+  .project-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+  .work-index {
+    grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 1.7fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 1.5rem 2.5rem;
+  }
+
+  .project-carousel {
+    height: min(61svh, 41rem);
+  }
+
+  .project-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .work-index {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+    padding-top: 7.5rem;
+  }
+
+  .project-rail {
+    grid-column: 1;
   }
 }

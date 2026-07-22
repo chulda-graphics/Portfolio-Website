@@ -107,7 +107,7 @@ export function MotionSystem() {
           setTransition("idle");
           navigationPending.current = false;
           delete document.body.dataset.routeTransition;
-        }, 620);
+        }, 760);
       });
     });
     return () => {
@@ -170,7 +170,7 @@ export function MotionSystem() {
       transitionTimer.current = window.setTimeout(() => {
         resetScrollState();
         router.push(`${destination.pathname}${destination.search}${destination.hash}`, { scroll: false });
-      }, 400);
+      }, 520);
     };
 
     document.addEventListener("click", onClick);

@@ -62,31 +62,31 @@ function scaleFrom(center: PortalPoint, point: PortalPoint, amount: number): Por
   };
 }
 
-function containQuad(
+function coverQuad(
   corners: PortalPoint[],
   sourceAspect: number,
   screenAspect: number,
 ): PortalPoint[] {
   if (sourceAspect > screenAspect) {
-    const amount = screenAspect / sourceAspect;
-    const left = midpoint(corners[0], corners[3]);
-    const right = midpoint(corners[1], corners[2]);
+    const amount = sourceAspect / screenAspect;
+    const top = midpoint(corners[0], corners[1]);
+    const bottom = midpoint(corners[3], corners[2]);
     return [
-      scaleFrom(left, corners[0], amount),
-      scaleFrom(right, corners[1], amount),
-      scaleFrom(right, corners[2], amount),
-      scaleFrom(left, corners[3], amount),
+      scaleFrom(top, corners[0], amount),
+      scaleFrom(top, corners[1], amount),
+      scaleFrom(bottom, corners[2], amount),
+      scaleFrom(bottom, corners[3], amount),
     ];
   }
 
-  const amount = sourceAspect / screenAspect;
-  const top = midpoint(corners[0], corners[1]);
-  const bottom = midpoint(corners[3], corners[2]);
+  const amount = screenAspect / sourceAspect;
+  const left = midpoint(corners[0], corners[3]);
+  const right = midpoint(corners[1], corners[2]);
   return [
-    scaleFrom(top, corners[0], amount),
-    scaleFrom(top, corners[1], amount),
-    scaleFrom(bottom, corners[2], amount),
-    scaleFrom(bottom, corners[3], amount),
+    scaleFrom(left, corners[0], amount),
+    scaleFrom(right, corners[1], amount),
+    scaleFrom(right, corners[2], amount),
+    scaleFrom(left, corners[3], amount),
   ];
 }
 
@@ -211,6 +211,8 @@ export function MacbookIntro() {
     ]);
     const displayCenterTarget = new THREE.Vector3(0, 0.35, 0.05);
     const displayNormalTarget = new THREE.Vector3(0, 0, 1);
+    const openingCameraPositionTarget = revealCameraPath.getPoint(1);
+    const openingLookTarget = revealTargetPath.getPoint(1);
     camera.position.copy(revealCameraPath.getPoint(1));
     camera.lookAt(revealTargetPath.getPoint(1));
 
@@ -297,7 +299,9 @@ export function MacbookIntro() {
         || !canvas.current
         || displayLocalCorners.length !== 4
       ) return;
-      portalViewport.style.visibility = screenPresence > 0.0001 ? "visible" : "hidden";
+      // The DOM portal sits above WebGL, so keep it physically inside the lid until
+      // the display is facing the camera enough to contain the projected page.
+      portalViewport.style.visibility = screenPresence > 0.16 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
       const projectedCorners = displayLocalCorners.map((localCorner) => {
         const point = localCorner.clone();
@@ -318,12 +322,12 @@ export function MacbookIntro() {
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
       }));
-      const containedCorners = containQuad(
+      const coveredCorners = coverQuad(
         projectedCorners,
         window.innerWidth / window.innerHeight,
         displayAspect,
       );
-      const contentCorners = containedCorners.map((corner, index) => ({
+      const contentCorners = coveredCorners.map((corner, index) => ({
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
       }));
@@ -359,12 +363,35 @@ export function MacbookIntro() {
       openingProgress = easeInOut(clamp(progress / 0.36));
       approachProgress = clamp((progress - 0.36) / 0.64);
       const approachEased = easeInOut(approachProgress);
+      if (lidPivot) lidPivot.rotation.x = THREE.MathUtils.lerp(CLOSED_LID_ROTATION, 0, openingProgress);
+      pivotRotationY = approachProgress > 0
+        ? THREE.MathUtils.lerp(-0.05, 0, approachEased)
+        : THREE.MathUtils.lerp(-0.1, -0.05, openingProgress);
+      pivotRotationX = approachProgress > 0
+        ? THREE.MathUtils.lerp(-0.03, 0, approachEased)
+        : THREE.MathUtils.lerp(-0.07, -0.03, openingProgress);
+      pivot.rotation.x = pivotRotationX;
+      pivot.rotation.y = pivotRotationY;
       if (approachProgress <= 0) {
-        camera.position.copy(revealCameraPath.getPoint(openingProgress));
-        camera.lookAt(revealTargetPath.getPoint(openingProgress));
+        const basePosition = revealCameraPath.getPoint(openingProgress);
+        const baseTarget = revealTargetPath.getPoint(openingProgress);
+        if (model) {
+          pivot.updateMatrixWorld(true);
+          const opticalCenter = new THREE.Box3().setFromObject(model).getCenter(new THREE.Vector3());
+          opticalCenter.y += 0.02;
+          openingLookTarget.copy(opticalCenter);
+          openingCameraPositionTarget.copy(basePosition).add(opticalCenter.clone().sub(baseTarget));
+          camera.position.copy(openingCameraPositionTarget);
+          camera.lookAt(openingLookTarget);
+        } else {
+          openingCameraPositionTarget.copy(basePosition);
+          openingLookTarget.copy(baseTarget);
+          camera.position.copy(basePosition);
+          camera.lookAt(baseTarget);
+        }
       } else {
         const inverse = 1 - approachEased;
-        const start = revealCameraPath.getPoint(1);
+        const start = openingCameraPositionTarget;
         const control = displayCenterTarget.clone()
           .addScaledVector(displayNormalTarget, handoffDistance + 2.25)
           .add(new THREE.Vector3(0.12, 0.18, 0));
@@ -373,17 +400,10 @@ export function MacbookIntro() {
         camera.position.copy(start).multiplyScalar(inverse * inverse)
           .addScaledVector(control, 2 * inverse * approachEased)
           .addScaledVector(end, approachEased * approachEased);
-        const target = revealTargetPath.getPoint(1)
+        const target = openingLookTarget.clone()
           .lerp(displayCenterTarget, approachEased);
         camera.lookAt(target);
       }
-      if (lidPivot) lidPivot.rotation.x = THREE.MathUtils.lerp(CLOSED_LID_ROTATION, 0, openingProgress);
-      pivotRotationY = approachProgress > 0
-        ? THREE.MathUtils.lerp(-0.05, 0, approachEased)
-        : THREE.MathUtils.lerp(-0.1, -0.05, openingProgress);
-      pivotRotationX = approachProgress > 0
-        ? THREE.MathUtils.lerp(-0.03, 0, approachEased)
-        : THREE.MathUtils.lerp(-0.07, -0.03, openingProgress);
       const interfaceProgress = easeInOut(clamp((progress - 0.82) / 0.1));
       if (progress < 0.92) {
         document.body.dataset.productIntro = "true";

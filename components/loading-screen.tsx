@@ -46,14 +46,14 @@ export function LoadingScreen() {
       }
       document.body.dataset.loaded = "true";
       window.dispatchEvent(new Event("dhrex:loaded"));
-      window.setTimeout(() => setVisible(false), reduceMotion ? 30 : 150);
+      window.setTimeout(() => setVisible(false), reduceMotion ? 20 : 90);
     };
 
     const update = (time: number) => {
       const elapsed = time - startedAt;
-      const minimumDuration = reduceMotion ? 120 : 850;
-      const maximumDuration = reduceMotion ? 180 : 2400;
-      const waitingProgress = Math.min(88, (elapsed / maximumDuration) * 100);
+      const minimumDuration = reduceMotion ? 80 : 420;
+      const maximumDuration = reduceMotion ? 140 : 1400;
+      const waitingProgress = Math.min(92, (elapsed / maximumDuration) * 100);
       const complete = elapsed >= maximumDuration || (modelReady && elapsed >= minimumDuration);
       const target = complete ? 100 : waitingProgress;
       setProgress(Math.round(target));

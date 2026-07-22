@@ -1,140 +1,186 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { projects } from "@/lib/projects";
+
+const ROTATION_INTERVAL = 4600;
+
+function carouselPosition(index: number, activeIndex: number) {
+  const forward = (index - activeIndex + projects.length) % projects.length;
+  if (forward === 0) return "active";
+  return forward === 1 ? "next" : "previous";
+}
 
 export function ProjectSelector() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [userIsChoosing, setUserIsChoosing] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
+  const [hovered, setHovered] = useState(false);
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeProject = projects[activeIndex];
 
-  useEffect(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reduceMotion || userIsChoosing || !autoRotate) return;
-
-    const interval = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % projects.length);
-    }, 5200);
-
-    return () => window.clearInterval(interval);
-  }, [userIsChoosing, autoRotate]);
-
-  useEffect(() => {
-    return () => {
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    };
-  }, []);
-
-  const chooseProject = (index: number) => {
-    setActiveIndex(index);
-    setUserIsChoosing(true);
+  const selectProject = (index: number, pause = true) => {
+    setActiveIndex((index + projects.length) % projects.length);
+    if (!pause) return;
+    setAutoRotate(false);
     if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(() => setUserIsChoosing(false), 9000);
+    resumeTimer.current = setTimeout(() => setAutoRotate(true), 8000);
   };
 
-  const status = useMemo(
-    () => (activeProject.href ? "View case study" : "In development"),
-    [activeProject],
-  );
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion || hovered || !autoRotate) return;
+    const interval = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % projects.length);
+    }, ROTATION_INTERVAL);
+    return () => window.clearInterval(interval);
+  }, [autoRotate, hovered]);
 
-  const preview = (
-    <div className="project-preview-card" key={activeProject.index}>
-      <picture>
-        <source srcSet={activeProject.coverAvif} type="image/avif" />
-        <img
-          src={activeProject.cover}
-          alt={activeProject.alt}
-          width={activeProject.width}
-          height={activeProject.height}
-          loading={activeIndex === 0 ? "eager" : "lazy"}
-          fetchPriority={activeIndex === 0 ? "high" : "auto"}
-          decoding="async"
-        />
-      </picture>
-      <div className="project-preview-shade" />
-      <div className="project-preview-meta">
-        <span>{activeProject.index} / {String(projects.length).padStart(2, "0")}</span>
-        <span>{status}</span>
-      </div>
-      <div className="project-preview-title">
-        <span>{activeProject.descriptor}</span>
-        <strong>{activeProject.title}</strong>
-      </div>
-    </div>
-  );
+  useEffect(() => () => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+  }, []);
+
+  const tiltCard = (event: ReactPointerEvent<HTMLElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty("--card-tilt-x", `${x * 3.5}deg`);
+    event.currentTarget.style.setProperty("--card-tilt-y", `${y * -3}deg`);
+  };
+
+  const resetTilt = (event: ReactPointerEvent<HTMLElement>) => {
+    event.currentTarget.style.removeProperty("--card-tilt-x");
+    event.currentTarget.style.removeProperty("--card-tilt-y");
+  };
+
+  const toggleAutoRotate = () => {
+    if (resumeTimer.current) {
+      clearTimeout(resumeTimer.current);
+      resumeTimer.current = null;
+    }
+    setAutoRotate((value) => !value);
+  };
 
   return (
     <section className="work-index" data-home-portal aria-labelledby="work-title">
       <div className="work-intro">
         <p className="eyebrow">Selected work / 2026</p>
-        <h1 id="work-title">
-          Clarity,
-          <br />
-          set in motion.
-        </h1>
+        <h1 id="work-title">Clarity,<br />set in motion.</h1>
         <p className="work-intro-copy">
           Purpose-led motion for SaaS products. Every frame is built to explain,
           guide, and connect.
         </p>
-        <button
-          className="rotation-toggle"
-          type="button"
-          onClick={() => setAutoRotate((value) => !value)}
-          aria-pressed={!autoRotate}
-        >
-          <span aria-hidden="true">{autoRotate ? "Ⅱ" : "▶"}</span>
-          {autoRotate ? "Pause project rotation" : "Resume project rotation"}
-        </button>
       </div>
 
-      <div className="preview-orbit" aria-live={userIsChoosing ? "polite" : "off"}>
-        <span className="orbit-line orbit-line-one" aria-hidden="true" />
-        <span className="orbit-line orbit-line-two" aria-hidden="true" />
-        {activeProject.href ? (
-          <Link
-            className="project-preview-link"
-            href={activeProject.href}
-            data-cursor="view"
-            aria-label={`View ${activeProject.title} case study`}
+      <div
+        className="project-carousel"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Selected projects"
+        tabIndex={0}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            selectProject(activeIndex + 1);
+          } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            selectProject(activeIndex - 1);
+          }
+        }}
+      >
+        <div className="carousel-orbit" aria-hidden="true" />
+        <div className="carousel-stage">
+          {projects.map((project, index) => {
+            const position = carouselPosition(index, activeIndex);
+            const active = position === "active";
+            const card = (
+              <article
+                className={`carousel-card${project.href ? "" : " is-coming"}`}
+                onPointerMove={active ? tiltCard : undefined}
+                onPointerLeave={active ? resetTilt : undefined}
+              >
+                <picture>
+                  <source srcSet={project.coverAvif} type="image/avif" />
+                  <img
+                    src={project.cover}
+                    alt={active ? project.alt : ""}
+                    width={project.width}
+                    height={project.height}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    decoding="async"
+                  />
+                </picture>
+                <div className="carousel-card-shade" />
+                {!project.href ? <div className="coming-soon-grid" aria-hidden="true" /> : null}
+                <div className="carousel-card-topline">
+                  <span>{project.index} / {String(projects.length).padStart(2, "0")}</span>
+                  <span>{project.href ? "View case study" : "In development"}</span>
+                </div>
+                <div className="carousel-card-title">
+                  <span>{project.descriptor}</span>
+                  <strong>{project.title}</strong>
+                </div>
+              </article>
+            );
+
+            return (
+              <div
+                className="project-carousel-item"
+                data-position={position}
+                key={project.index}
+                aria-hidden={!active}
+              >
+                {active && project.href ? (
+                  <Link
+                    href={project.href}
+                    data-cursor="View"
+                    aria-label={`View ${project.title} case study`}
+                  >
+                    {card}
+                  </Link>
+                ) : active ? (
+                  <div aria-label={`${project.title}, ${project.descriptor}`}>{card}</div>
+                ) : (
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => selectProject(index)}
+                    aria-label={`Show ${project.title}`}
+                  >
+                    {card}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="carousel-controls">
+          <button type="button" onClick={() => selectProject(activeIndex - 1)} aria-label="Previous project">←</button>
+          <button
+            type="button"
+            onClick={toggleAutoRotate}
+            aria-label={autoRotate ? "Pause project rotation" : "Resume project rotation"}
+            aria-pressed={!autoRotate}
           >
-            {preview}
-          </Link>
-        ) : (
-          <div className="project-preview-link is-inert">{preview}</div>
-        )}
+            {autoRotate ? "Ⅱ" : "▶"}
+          </button>
+          <button type="button" onClick={() => selectProject(activeIndex + 1)} aria-label="Next project">→</button>
+        </div>
       </div>
 
       <ol className="project-rail" aria-label="Project index">
         {projects.map((project, index) => (
-          <li
-            key={`${project.index}-${project.title}`}
-            data-active={index === activeIndex}
-            onPointerEnter={() => chooseProject(index)}
-          >
-            {project.href ? (
-              <Link
-                href={project.href}
-                onFocus={() => chooseProject(index)}
-                aria-label={`${project.index}. ${project.title}, ${project.descriptor}`}
-              >
-                <span className="project-number">{project.index}</span>
-                <span className="project-name">{project.title}</span>
-                <span className="project-kind">{project.descriptor}</span>
-                <span className="project-year">{project.year}</span>
-              </Link>
-            ) : (
-              <div aria-label={`${project.index}. Coming soon`}>
-                <span className="project-number">{project.index}</span>
-                <span className="project-name">{project.title}</span>
-                <span className="project-kind">{project.descriptor}</span>
-                <span className="project-year">{project.year}</span>
-              </div>
-            )}
+          <li key={project.index} data-active={index === activeIndex}>
+            <button type="button" onClick={() => selectProject(index)} aria-current={index === activeIndex ? "true" : undefined}>
+              <span className="project-number">{project.index}</span>
+              <span className="project-name">{project.title}</span>
+              <span className="project-kind">{project.descriptor}</span>
+              <span className="project-year">{project.year}</span>
+            </button>
           </li>
         ))}
       </ol>
