@@ -127,6 +127,7 @@ export function MacbookIntro() {
     const simplified = reduceMotion || window.matchMedia("(max-width: 900px)").matches;
     const workIndex = document.querySelector<HTMLElement>("[data-home-portal]");
     const portalViewport = document.querySelector<HTMLElement>("[data-home-portal-viewport]");
+    const portalGlass = document.querySelector<HTMLElement>("[data-home-portal-glass]");
     const homeEntry = section.current.closest<HTMLElement>(".home-entry");
     const activateFallback = () => {
       if (section.current) {
@@ -148,6 +149,11 @@ export function MacbookIntro() {
         portalViewport.style.removeProperty("visibility");
         portalViewport.style.removeProperty("width");
         portalViewport.style.removeProperty("height");
+        portalViewport.style.removeProperty("filter");
+      }
+      if (portalGlass) {
+        portalGlass.style.removeProperty("transform");
+        portalGlass.style.removeProperty("opacity");
       }
       delete document.body.dataset.productIntro;
       document.body.style.removeProperty("--product-ui-progress");
@@ -204,8 +210,8 @@ export function MacbookIntro() {
     const cameraPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0.12, 1.02, 6.9),
       new THREE.Vector3(0.07, 0.82, 4.7),
-      new THREE.Vector3(0.025, 0.42, 2.4),
-      new THREE.Vector3(0, -0.06, 0.92),
+      new THREE.Vector3(0.025, 0.54, 2.4),
+      new THREE.Vector3(0, 0.35, 0.92),
     ]);
     const targetPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 0.28, 0),
@@ -213,6 +219,8 @@ export function MacbookIntro() {
       new THREE.Vector3(0, 0.34, 0.035),
       new THREE.Vector3(0, 0.35, 0.05),
     ]);
+    const displayCenterTarget = new THREE.Vector3(0, 0.35, 0.05);
+    const displayNormalTarget = new THREE.Vector3(0, 0, 1);
     camera.position.copy(cameraPath.getPoint(0));
     camera.lookAt(targetPath.getPoint(0));
 
@@ -246,6 +254,9 @@ export function MacbookIntro() {
     let visible = true;
     let frame = 0;
     let progress = 0;
+    let openingProgress = 0;
+    let approachProgress = 0;
+    let portalDirty = true;
     let pivotRotationX = -0.07;
     let pivotRotationY = -0.2;
     let entranceStartedAt = 0;
@@ -263,11 +274,12 @@ export function MacbookIntro() {
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      portalDirty = true;
     };
 
     const updatePortal = (revealProgress: number, screenPresence: number) => {
       if (!workIndex || !portalViewport || !screenMesh || !canvas.current) return;
-      portalViewport.style.visibility = screenPresence > 0.06 ? "visible" : "hidden";
+      portalViewport.style.visibility = screenPresence > 0.015 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
       const positions = screenMesh.geometry.getAttribute("position");
       const points = Array.from({ length: positions.count }, (_, index) => {
@@ -307,12 +319,20 @@ export function MacbookIntro() {
       portalViewport.style.clipPath = `polygon(${clipCorners.map((corner) => `${corner.x}px ${corner.y}px`).join(", ")})`;
       portalViewport.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
       portalViewport.style.transform = "none";
-      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.32, 1, easeInOut(screenPresence))})`;
+      const displayPresence = easeInOut(screenPresence);
+      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.38, 1, displayPresence)})`;
       workIndex.style.transform = portalMatrix(
         window.innerWidth,
         window.innerHeight,
         contentCorners,
       );
+      portalViewport.style.filter = portalProgress < 0.98
+        ? `drop-shadow(0 0 ${THREE.MathUtils.lerp(7, 16, displayPresence)}px rgba(194, 213, 225, ${THREE.MathUtils.lerp(0.05, 0.13, displayPresence)}))`
+        : "none";
+      if (portalGlass) {
+        portalGlass.style.transform = workIndex.style.transform;
+        portalGlass.style.opacity = String((1 - portalProgress) * THREE.MathUtils.lerp(0.08, 0.2, displayPresence));
+      }
       const live = revealProgress >= 0.9;
       workIndex.inert = !live;
       workIndex.dataset.portalLive = live ? "true" : "false";
@@ -325,15 +345,23 @@ export function MacbookIntro() {
       const rect = section.current.getBoundingClientRect();
       const distance = Math.max(section.current.offsetHeight - window.innerHeight, 1);
       progress = clamp(-rect.top / distance);
-      const openingProgress = easeInOut(clamp(progress / 0.36));
-      const approachProgress = clamp((progress - 0.36) / 0.64);
+      openingProgress = easeInOut(clamp(progress / 0.36));
+      approachProgress = clamp((progress - 0.36) / 0.64);
       const approachEased = easeInOut(approachProgress);
       if (approachProgress <= 0) {
         camera.position.copy(revealCameraPath.getPoint(openingProgress));
         camera.lookAt(revealTargetPath.getPoint(openingProgress));
       } else {
-        camera.position.copy(cameraPath.getPoint(approachEased));
-        camera.lookAt(targetPath.getPoint(approachEased));
+        const curvePosition = cameraPath.getPoint(approachEased);
+        const curveTarget = targetPath.getPoint(approachEased);
+        const straightProgress = easeInOut(clamp((approachProgress - 0.38) / 0.62));
+        const alignment = easeInOut(clamp((approachProgress - 0.45) / 0.3));
+        const straightPosition = displayCenterTarget.clone().addScaledVector(
+          displayNormalTarget,
+          THREE.MathUtils.lerp(3.2, 0.86, straightProgress),
+        );
+        camera.position.copy(curvePosition).lerp(straightPosition, alignment);
+        camera.lookAt(curveTarget.lerp(displayCenterTarget, alignment));
       }
       if (lidPivot) lidPivot.rotation.x = THREE.MathUtils.lerp(CLOSED_LID_ROTATION, 0, openingProgress);
       pivotRotationY = approachProgress > 0
@@ -350,7 +378,7 @@ export function MacbookIntro() {
         delete document.body.dataset.productIntro;
         document.body.style.removeProperty("--product-ui-progress");
       }
-      updatePortal(approachProgress, openingProgress);
+      portalDirty = true;
     };
 
     const draw = (time: number) => {
@@ -360,15 +388,22 @@ export function MacbookIntro() {
           : 0;
         const entranceProgress = easeInOut(entranceLinear);
         entranceRig.scale.setScalar(THREE.MathUtils.lerp(0.72, 1, entranceProgress));
+        entranceRig.position.x = THREE.MathUtils.lerp(0.18, 0, entranceProgress);
         entranceRig.position.y = THREE.MathUtils.lerp(-0.2, 0, entranceProgress);
         entranceRig.position.z = THREE.MathUtils.lerp(-0.8, 0, entranceProgress);
-        entranceRig.rotation.y = THREE.MathUtils.lerp(0.1, 0, entranceProgress);
-        entranceRig.rotation.z = THREE.MathUtils.lerp(-0.022, 0, entranceProgress);
-        const openingPresence = 1 - easeInOut(clamp((progress - 0.32) / 0.3));
+        entranceRig.rotation.x = THREE.MathUtils.lerp(0.04, 0, entranceProgress);
+        entranceRig.rotation.y = THREE.MathUtils.lerp(0.15, 0, entranceProgress);
+        entranceRig.rotation.z = THREE.MathUtils.lerp(-0.03, 0, entranceProgress);
+        const openingPresence = 1 - easeInOut(clamp(progress / 0.08));
         floatRig.position.y = Math.sin(time * 0.00055) * 0.018 * openingPresence;
         floatRig.rotation.z = Math.cos(time * 0.00042) * 0.004 * openingPresence;
         pivot.rotation.x = pivotRotationX + Math.sin(time * 0.00038) * 0.004 * openingPresence;
         pivot.rotation.y = pivotRotationY + Math.cos(time * 0.00031) * 0.006 * openingPresence;
+        if (portalDirty || openingPresence > 0 || entranceLinear < 1) {
+          camera.updateMatrixWorld(true);
+          updatePortal(approachProgress, openingProgress);
+          portalDirty = false;
+        }
         renderer.render(scene, camera);
       }
       frame = requestAnimationFrame(draw);
@@ -403,11 +438,17 @@ export function MacbookIntro() {
                   .sort((first, second) => second - first);
                 if (dimensions.length >= 2) screenAspect = dimensions[0] / dimensions[1];
               }
-              const screenMaterial = new THREE.MeshBasicMaterial({
+              const screenMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x11161a,
                 transparent: true,
-                opacity: 0,
+                opacity: 0.11,
+                metalness: 0.05,
+                roughness: 0.16,
+                clearcoat: 1,
+                clearcoatRoughness: 0.11,
+                envMapIntensity: 2.5,
                 depthWrite: false,
-                colorWrite: false,
+                side: THREE.DoubleSide,
               });
               material.dispose();
               if (Array.isArray(object.material)) object.material[index] = screenMaterial;
@@ -450,6 +491,57 @@ export function MacbookIntro() {
         const scale = 3.55 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         pivot.add(model);
+
+        if (screenMesh && screenMesh.geometry.boundingBox) {
+          const savedLidRotation = lidPivot.rotation.x;
+          const savedPivotRotation = pivot.rotation.clone();
+          lidPivot.rotation.x = 0;
+          pivot.rotation.set(0, 0, 0);
+          entranceRig.position.set(0, 0, 0);
+          entranceRig.rotation.set(0, 0, 0);
+          entranceRig.scale.setScalar(1);
+          entranceRig.updateMatrixWorld(true);
+
+          const screenPositions = screenMesh.geometry.getAttribute("position");
+          const screenPoints = Array.from(
+            { length: screenPositions.count },
+            (_, index) => new THREE.Vector3().fromBufferAttribute(screenPositions, index),
+          );
+          const localCorners = [
+            screenPoints.reduce((corner, point) => point.x - point.y < corner.x - corner.y ? point : corner),
+            screenPoints.reduce((corner, point) => point.x + point.y > corner.x + corner.y ? point : corner),
+            screenPoints.reduce((corner, point) => point.x - point.y > corner.x - corner.y ? point : corner),
+            screenPoints.reduce((corner, point) => point.x + point.y < corner.x + corner.y ? point : corner),
+          ];
+          const worldCorners = localCorners.map((corner) => {
+            const worldCorner = corner.clone();
+            screenMesh!.localToWorld(worldCorner);
+            return worldCorner;
+          });
+          const displayCenter = worldCorners
+            .reduce((center, corner) => center.add(corner), new THREE.Vector3())
+            .multiplyScalar(0.25);
+          const displayNormal = worldCorners[1].clone().sub(worldCorners[0])
+            .cross(worldCorners[3].clone().sub(worldCorners[0]))
+            .normalize();
+          if (displayNormal.z < 0) displayNormal.negate();
+          displayCenterTarget.copy(displayCenter);
+          displayNormalTarget.copy(displayNormal);
+
+          targetPath.points[2].copy(displayCenter);
+          targetPath.points[3].copy(displayCenter);
+          cameraPath.points[2]
+            .copy(displayCenter)
+            .addScaledVector(displayNormal, 2.4);
+          cameraPath.points[3]
+            .copy(displayCenter)
+            .addScaledVector(displayNormal, 0.86);
+
+          lidPivot.rotation.x = savedLidRotation;
+          pivot.rotation.copy(savedPivotRotation);
+          entranceRig.updateMatrixWorld(true);
+        }
+
         entranceStartedAt = performance.now();
         updateProgress();
         section.current?.setAttribute("data-model-ready", "true");
@@ -493,7 +585,12 @@ export function MacbookIntro() {
         portalViewport.style.removeProperty("visibility");
         portalViewport.style.removeProperty("width");
         portalViewport.style.removeProperty("height");
+        portalViewport.style.removeProperty("filter");
         delete portalViewport.dataset.portalLive;
+      }
+      if (portalGlass) {
+        portalGlass.style.removeProperty("transform");
+        portalGlass.style.removeProperty("opacity");
       }
       delete document.body.dataset.productIntro;
       document.body.style.removeProperty("--product-ui-progress");

@@ -27,6 +27,7 @@ export default function WorkPage() {
         <MacbookIntroLazy />
         <div className="home-portal" data-home-portal-viewport>
           <ProjectSelector />
+          <div className="home-portal-glass" data-home-portal-glass aria-hidden="true" />
         </div>
       </div>
       <section className="work-statement" aria-labelledby="work-statement-title">

@@ -1927,12 +1927,27 @@ body[data-scrolled="true"] .site-header {
 
 .home-portal > .work-index {
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100vw;
   min-height: 100svh;
   transform-origin: top left;
   will-change: transform, filter;
+}
+
+.home-portal-glass {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(128deg, rgba(255, 255, 255, 0.12), transparent 24%, transparent 68%, rgba(172, 190, 205, 0.045)),
+    radial-gradient(circle at 52% 18%, rgba(218, 230, 238, 0.08), transparent 48%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform-origin: top left;
+  will-change: transform, opacity;
 }
 
 .macbook-intro {
@@ -2765,6 +2780,10 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     filter: none !important;
     transform: none !important;
     will-change: auto;
+  }
+
+  .home-portal-glass {
+    display: none;
   }
 
   .macbook-intro {
