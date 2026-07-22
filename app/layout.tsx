@@ -33,6 +33,18 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: "Dhrex" }],
     creator: "Dhrex",
     category: "Motion Design",
+    keywords: [
+      "SaaS motion graphic designer",
+      "SaaS motion designer",
+      "SaaS video editor",
+      "SaaS portfolio",
+      "SaaS creators",
+      "SaaS editor",
+      "video editor",
+      "launch video editor",
+      "product launch motion graphics",
+      "UI UX motion design",
+    ],
     robots: {
       index: true,
       follow: true,

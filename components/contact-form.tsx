@@ -51,7 +51,14 @@ export function ContactForm() {
         <input type="hidden" name="_subject" value="New portfolio project inquiry" />
         <input type="hidden" name="_template" value="table" />
         <input type="hidden" name="_captcha" value="false" />
-        <input type="text" name="_honey" className="form-honeypot" tabIndex={-1} autoComplete="off" />
+        <input
+          type="text"
+          name="_honey"
+          className="form-honeypot"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
 
         <div className="form-field">
           <label htmlFor="name">Your name</label>

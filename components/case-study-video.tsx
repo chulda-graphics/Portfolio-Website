@@ -87,7 +87,7 @@ export function CaseStudyVideo({ src, poster, title }: CaseStudyVideoProps) {
         src={mediaEnabled ? src : undefined}
         poster={poster}
         autoPlay={mediaEnabled}
-        muted
+        muted={muted}
         loop
         playsInline
         preload={mediaEnabled ? "metadata" : "none"}

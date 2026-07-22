@@ -7,9 +7,16 @@ type BookingButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 };
 
-export function BookingButton({ children, type = "button", ...props }: BookingButtonProps) {
+export function BookingButton({ children, type = "button", onClick, ...props }: BookingButtonProps) {
   return (
-    <button type={type} onClick={openBooking} {...props}>
+    <button
+      type={type}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) openBooking();
+      }}
+      {...props}
+    >
       {children}
     </button>
   );

@@ -109,6 +109,10 @@ export function FramePreview({ title, frames }: FramePreviewProps) {
       }}
       onPointerMove={(event) => {
         if (!section.current || event.pointerType !== "mouse") return;
+        // The section can scroll underneath an already-stationary pointer, in
+        // which case the browser does not reliably dispatch pointerenter.
+        // Pointer movement inside the panel is the authoritative active state.
+        setActive(true);
         const rect = section.current.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;

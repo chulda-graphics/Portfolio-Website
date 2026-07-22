@@ -264,12 +264,19 @@ export function MotionSystem() {
       if (cursor.current) {
         cursor.current.style.transform = `translate3d(${renderedX}px, ${renderedY}px, 0)`;
       }
-      frame = requestAnimationFrame(draw);
+      if (Math.abs(pointerX - renderedX) > 0.08 || Math.abs(pointerY - renderedY) > 0.08) {
+        frame = requestAnimationFrame(draw);
+      } else {
+        renderedX = pointerX;
+        renderedY = pointerY;
+        frame = 0;
+      }
     };
     const onMove = (event: PointerEvent) => {
       pointerX = event.clientX;
       pointerY = event.clientY;
       cursor.current?.setAttribute("data-visible", "true");
+      if (!frame) frame = requestAnimationFrame(draw);
     };
     const onOver = (event: PointerEvent) => {
       const target = event.target as HTMLElement | null;
@@ -280,7 +287,6 @@ export function MotionSystem() {
     };
     const onLeave = () => cursor.current?.setAttribute("data-visible", "false");
 
-    frame = requestAnimationFrame(draw);
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerover", onOver, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);

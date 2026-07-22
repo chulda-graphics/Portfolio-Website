@@ -3339,6 +3339,8 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     bottom: 4.5rem;
     left: var(--page-pad);
     display: flex;
+    height: 3rem;
+    align-items: stretch;
     gap: 0.5rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -3346,7 +3348,8 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 
   .frame-touch-rail button {
     width: 5rem;
-    flex: 0 0 auto;
+    height: 100%;
+    flex: 0 0 5rem;
     padding: 0;
     overflow: hidden;
     border: 1px solid transparent;
@@ -3360,7 +3363,7 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 
   .frame-touch-rail img {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
   }
 
@@ -3374,6 +3377,19 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
 }
 
 @media (max-width: 760px) {
+  body[data-menu-open="true"] .site-header {
+    /* backdrop-filter creates a containing block for fixed descendants in
+       WebKit/Chromium, which collapsed the fixed menu to the header height. */
+    border-color: transparent;
+    background: #050505;
+    backdrop-filter: none;
+  }
+
+  .mobile-menu {
+    height: 100dvh;
+    min-height: 100svh;
+  }
+
   body[data-scrolled="true"] .site-header {
     height: 4.3rem;
   }

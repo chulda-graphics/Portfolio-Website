@@ -19,8 +19,11 @@ export function SiteHeader() {
 
   useEffect(() => {
     document.body.dataset.menuOpen = open ? "true" : "false";
+    let focusTimer = 0;
     if (open) {
-      menuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+      focusTimer = window.setTimeout(() => {
+        menuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+      }, 0);
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -28,9 +31,24 @@ export function SiteHeader() {
         setOpen(false);
         toggleRef.current?.focus();
       }
+      if (event.key === "Tab" && open) {
+        const menuItems = Array.from(
+          menuRef.current?.querySelectorAll<HTMLElement>("a, button") ?? [],
+        );
+        const first = toggleRef.current;
+        const last = menuItems.at(-1);
+        if (event.shiftKey && document.activeElement === first && last) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last && first) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
       delete document.body.dataset.menuOpen;
       window.removeEventListener("keydown", onKeyDown);
     };
@@ -109,7 +127,9 @@ export function SiteHeader() {
           <p>Remote worldwide</p>
           <p>Available for freelance</p>
         </div>
-        <BookingButton className="mobile-booking-button">Schedule a discovery call</BookingButton>
+        <BookingButton className="mobile-booking-button" onClick={() => setOpen(false)}>
+          Schedule a discovery call
+        </BookingButton>
       </div>
     </header>
   );

@@ -5,6 +5,7 @@ const socialLinks = [
   ["TikTok", "https://www.tiktok.com/@dhrex.in.motion"],
   ["LinkedIn", "https://www.linkedin.com/in/dhrex-ca%C3%B1ezo/"],
   ["X", "https://x.com/dhrexinmotion"],
+  ["Facebook", "https://www.facebook.com/canezo.dhrex/"],
 ];
 
 export function SiteFooter() {
