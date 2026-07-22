@@ -38,6 +38,8 @@ export function ProjectSelector() {
     let frame = 0;
     let previousTime = performance.now();
     let renderedActive = -1;
+    let renderedProgress = Number.NaN;
+    let renderedWidth = 0;
 
     const positionItems = () => {
       const stageWidth = stage.current?.clientWidth ?? window.innerWidth;
@@ -62,7 +64,6 @@ export function ProjectSelector() {
 
         item.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${-horizontal * 14}deg) rotateZ(${horizontal * 1.25}deg) scale(${scale})`;
         item.style.opacity = String(opacity);
-        item.style.filter = `brightness(${0.46 + depth * 0.54}) saturate(${0.42 + depth * 0.58})`;
         item.style.zIndex = String(Math.round(depth * 100));
         item.style.pointerEvents = active ? "auto" : "none";
         item.dataset.active = active ? "true" : "false";
@@ -90,7 +91,9 @@ export function ProjectSelector() {
             resumeAt.current = time + 650;
           }
         } else {
-          const canAutoplay = playing && time >= resumeAt.current;
+          const canAutoplay = playing
+            && time >= resumeAt.current
+            && document.body.dataset.productIntro !== "true";
           const desiredSpeed = canAutoplay
             ? AUTOPLAY_SPEED * (hovered.current ? 0.32 : 1)
             : 0;
@@ -103,7 +106,15 @@ export function ProjectSelector() {
       if (Math.abs(progress.current) > 1200 && targetProgress.current === null) {
         progress.current %= projects.length;
       }
-      positionItems();
+      const stageWidth = stage.current?.clientWidth ?? window.innerWidth;
+      if (
+        Math.abs(progress.current - renderedProgress) > 0.0001
+        || stageWidth !== renderedWidth
+      ) {
+        renderedProgress = progress.current;
+        renderedWidth = stageWidth;
+        positionItems();
+      }
       frame = requestAnimationFrame(draw);
     };
 

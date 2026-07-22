@@ -49,6 +49,101 @@ function createStudioEnvironment() {
   return environment;
 }
 
+function createHomepagePreviewTexture(onReady: () => void) {
+  const preview = document.createElement("canvas");
+  preview.width = 1536;
+  preview.height = 960;
+  const context = preview.getContext("2d");
+
+  const draw = (cover?: CanvasImageSource) => {
+    if (!context) return;
+    context.fillStyle = "#050505";
+    context.fillRect(0, 0, preview.width, preview.height);
+
+    const glow = context.createRadialGradient(790, 440, 30, 790, 440, 620);
+    glow.addColorStop(0, "rgba(255,255,255,0.07)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, preview.width, preview.height);
+
+    context.fillStyle = "rgba(247,247,245,0.68)";
+    context.font = "500 18px 'DM Sans', Arial, sans-serif";
+    context.letterSpacing = "3px";
+    context.fillText("SELECTED WORK / 2026", 84, 205);
+    context.fillStyle = "#f7f7f5";
+    context.font = "500 86px 'DM Sans', Arial, sans-serif";
+    context.letterSpacing = "-6px";
+    context.fillText("Clarity,", 82, 300);
+    context.fillText("set in", 82, 382);
+    context.fillText("motion.", 82, 464);
+    context.fillStyle = "rgba(247,247,245,0.62)";
+    context.font = "400 19px 'DM Sans', Arial, sans-serif";
+    context.letterSpacing = "0px";
+    context.fillText("Purpose-led motion for SaaS products.", 84, 520);
+    context.fillText("Built to explain, guide, and connect.", 84, 550);
+
+    const card = { x: 520, y: 184, width: 690, height: 442 };
+    context.fillStyle = "#0b0b0b";
+    context.fillRect(card.x, card.y, card.width, card.height);
+    if (cover) {
+      context.save();
+      context.beginPath();
+      context.rect(card.x, card.y, card.width, card.height);
+      context.clip();
+      context.drawImage(cover, card.x, card.y, card.width, card.height);
+      context.restore();
+    }
+    context.strokeStyle = "rgba(255,255,255,0.28)";
+    context.lineWidth = 2;
+    context.strokeRect(card.x, card.y, card.width, card.height);
+    context.fillStyle = "rgba(247,247,245,0.8)";
+    context.font = "500 15px 'DM Sans', Arial, sans-serif";
+    context.fillText("01 / 03", card.x + 24, card.y + 34);
+    context.textAlign = "right";
+    context.fillText("VIEW CASE STUDY", card.x + card.width - 24, card.y + 34);
+    context.fillStyle = "#f7f7f5";
+    context.font = "500 54px 'DM Sans', Arial, sans-serif";
+    context.letterSpacing = "-3px";
+    context.fillText("Demo Reel 2026", card.x + card.width - 25, card.y + card.height - 30);
+    context.textAlign = "left";
+
+    context.strokeStyle = "rgba(255,255,255,0.2)";
+    context.beginPath();
+    context.moveTo(1248, 252);
+    context.lineTo(1460, 252);
+    context.moveTo(1248, 330);
+    context.lineTo(1460, 330);
+    context.moveTo(1248, 408);
+    context.lineTo(1460, 408);
+    context.moveTo(1248, 486);
+    context.lineTo(1460, 486);
+    context.stroke();
+    context.fillStyle = "rgba(247,247,245,0.72)";
+    context.font = "500 18px 'DM Sans', Arial, sans-serif";
+    context.fillText("01    Demo Reel 2026", 1260, 302);
+    context.fillStyle = "rgba(247,247,245,0.42)";
+    context.fillText("02    StillSearch", 1260, 380);
+    context.fillText("03    Coming Soon", 1260, 458);
+  };
+
+  draw();
+  const texture = new THREE.CanvasTexture(preview);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const cover = new Image();
+  cover.decoding = "async";
+  cover.onload = () => {
+    draw(cover);
+    texture.needsUpdate = true;
+    onReady();
+  };
+  cover.src = "/assets/demo-reel-cover-v1.webp";
+  return texture;
+}
+
 type PortalPoint = { x: number; y: number };
 
 function midpoint(first: PortalPoint, second: PortalPoint): PortalPoint {
@@ -97,8 +192,8 @@ function focusCoveredQuad(corners: PortalPoint[]): PortalPoint[] {
   );
   const overscanned = corners.map((corner) => scaleFrom(center, corner, 1.028));
   const horizontal = {
-    x: (overscanned[1].x - overscanned[0].x) * 0.024,
-    y: (overscanned[1].y - overscanned[0].y) * 0.024,
+    x: (overscanned[1].x - overscanned[0].x) * 0.058,
+    y: (overscanned[1].y - overscanned[0].y) * 0.058,
   };
   return overscanned.map((corner) => ({
     x: corner.x + horizontal.x,
@@ -223,7 +318,7 @@ export function MacbookIntro() {
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.28;
@@ -289,6 +384,7 @@ export function MacbookIntro() {
     let pivotRotationX = -0.07;
     let pivotRotationY = -0.1;
     let entranceStartedAt = 0;
+    let screenPreviewTexture: THREE.CanvasTexture | null = null;
 
     const restartEntrance = () => {
       entranceStartedAt = performance.now();
@@ -334,7 +430,7 @@ export function MacbookIntro() {
       ) return;
       // The DOM portal sits above WebGL, so keep it physically inside the lid until
       // the display is facing the camera enough to contain the projected page.
-      portalViewport.style.visibility = screenPresence > 0.16 ? "visible" : "hidden";
+      portalViewport.style.visibility = screenPresence > 0.28 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
       const portalRect = portalViewport.getBoundingClientRect();
       const canvasRect = canvas.current.getBoundingClientRect();
@@ -372,15 +468,13 @@ export function MacbookIntro() {
       portalViewport.style.borderRadius = `${THREE.MathUtils.lerp(1.2, 0, portalProgress)}rem`;
       portalViewport.style.transform = "none";
       const displayPresence = easeInOut(screenPresence);
-      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.78, 1, displayPresence)})`;
+      workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.86, 1, displayPresence)})`;
       workIndex.style.transform = portalMatrix(
         sourceWidth,
         sourceHeight,
         contentCorners,
       );
-      portalViewport.style.filter = portalProgress < 0.98
-        ? `drop-shadow(0 0 ${THREE.MathUtils.lerp(6, 14, displayPresence)}px rgba(255, 255, 255, ${THREE.MathUtils.lerp(0.035, 0.09, displayPresence)}))`
-        : "none";
+      portalViewport.style.filter = "none";
       if (portalGlass) {
         portalGlass.style.transform = workIndex.style.transform;
         portalGlass.style.opacity = String((1 - portalProgress) * THREE.MathUtils.lerp(0.08, 0.2, displayPresence));
@@ -470,12 +564,13 @@ export function MacbookIntro() {
         floatRig.rotation.z = Math.cos(time * 0.00042) * 0.004 * openingPresence;
         pivot.rotation.x = pivotRotationX + Math.sin(time * 0.00038) * 0.004 * openingPresence;
         pivot.rotation.y = pivotRotationY + Math.cos(time * 0.00031) * 0.006 * openingPresence;
-        if (portalDirty || openingPresence > 0 || entranceLinear < 1) {
+        const shouldRender = portalDirty || openingPresence > 0.001 || entranceLinear < 1;
+        if (shouldRender) {
           camera.updateMatrixWorld(true);
           updatePortal(approachProgress, openingProgress);
           portalDirty = false;
+          renderer.render(scene, camera);
         }
-        renderer.render(scene, camera);
       }
       frame = requestAnimationFrame(draw);
     };
@@ -485,6 +580,9 @@ export function MacbookIntro() {
       "/models/macbook-pro-14-m5-v1.glb",
       (gltf) => {
         model = gltf.scene;
+        screenPreviewTexture = createHomepagePreviewTexture(() => {
+          portalDirty = true;
+        });
         const lidParts: THREE.Object3D[] = [];
         model.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
@@ -503,17 +601,16 @@ export function MacbookIntro() {
             if (isScreen) {
               screenMesh = object;
               const screenMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x181818,
-                emissive: 0x111111,
-                emissiveIntensity: 0.82,
-                transparent: true,
-                opacity: 0.5,
+                color: 0xffffff,
+                map: screenPreviewTexture,
+                emissive: 0xffffff,
+                emissiveMap: screenPreviewTexture,
+                emissiveIntensity: 0.48,
                 metalness: 0.02,
-                roughness: 0.12,
+                roughness: 0.16,
                 clearcoat: 1,
                 clearcoatRoughness: 0.08,
-                envMapIntensity: 2.8,
-                depthWrite: false,
+                envMapIntensity: 2.2,
                 side: THREE.DoubleSide,
               });
               material.dispose();
@@ -663,6 +760,7 @@ export function MacbookIntro() {
       delete document.body.dataset.productIntro;
       document.body.style.removeProperty("--product-ui-progress");
       studioEnvironment.dispose();
+      screenPreviewTexture?.dispose();
       scene.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         object.geometry.dispose();
