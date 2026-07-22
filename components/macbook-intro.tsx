@@ -16,6 +16,8 @@ function easeInOut(value: number) {
 }
 
 const CLOSED_LID_ROTATION = 1.92;
+const CAMERA_VERTICAL_FOV = 34;
+const CAMERA_REFERENCE_ASPECT = 16 / 9;
 
 function createStudioEnvironment() {
   const faces = [
@@ -155,7 +157,7 @@ export function MacbookIntro() {
     renderer.toneMappingExposure = 1.28;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 100);
+    const camera = new THREE.PerspectiveCamera(CAMERA_VERTICAL_FOV, 1, 0.01, 100);
     const revealCameraPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(1.5, 1.55, 7.2),
       new THREE.Vector3(1.3, 1.36, 7.15),
@@ -233,6 +235,14 @@ export function MacbookIntro() {
       const height = window.innerHeight;
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
+      camera.fov = camera.aspect < CAMERA_REFERENCE_ASPECT
+        ? THREE.MathUtils.radToDeg(
+            2 * Math.atan(
+              Math.tan(THREE.MathUtils.degToRad(CAMERA_VERTICAL_FOV / 2))
+              * CAMERA_REFERENCE_ASPECT / camera.aspect,
+            ),
+          )
+        : CAMERA_VERTICAL_FOV;
       camera.updateProjectionMatrix();
       portalDirty = true;
     };
@@ -256,7 +266,7 @@ export function MacbookIntro() {
         x: point.x * window.innerWidth / 100,
         y: point.y * window.innerHeight / 100,
       }));
-      const portalProgress = easeInOut(clamp((revealProgress - 0.66) / 0.25));
+      const portalProgress = easeInOut(clamp((revealProgress - 0.52) / 0.34));
       const viewportCorners = [
         { x: 0, y: 0 },
         { x: window.innerWidth, y: 0 },
@@ -282,7 +292,7 @@ export function MacbookIntro() {
         contentCorners,
       );
       portalViewport.style.filter = portalProgress < 0.98
-        ? `drop-shadow(0 0 ${THREE.MathUtils.lerp(7, 16, displayPresence)}px rgba(194, 213, 225, ${THREE.MathUtils.lerp(0.05, 0.13, displayPresence)}))`
+        ? `drop-shadow(0 0 ${THREE.MathUtils.lerp(6, 14, displayPresence)}px rgba(255, 255, 255, ${THREE.MathUtils.lerp(0.035, 0.09, displayPresence)}))`
         : "none";
       if (portalGlass) {
         portalGlass.style.transform = workIndex.style.transform;
@@ -387,11 +397,11 @@ export function MacbookIntro() {
             if (isScreen) {
               screenMesh = object;
               const screenMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x26333f,
-                emissive: 0x172430,
-                emissiveIntensity: 1.35,
+                color: 0x181818,
+                emissive: 0x111111,
+                emissiveIntensity: 0.82,
                 transparent: true,
-                opacity: 0.72,
+                opacity: 0.5,
                 metalness: 0.02,
                 roughness: 0.12,
                 clearcoat: 1,
