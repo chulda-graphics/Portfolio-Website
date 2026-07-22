@@ -335,6 +335,75 @@
   }
 }
 
+/* Continuous carousel and one-time intro behaviour */
+.home-portal > .work-index {
+  height: 100svh;
+  min-height: 100svh;
+}
+
+.project-carousel {
+  height: min(61svh, 46rem);
+}
+
+.carousel-stage {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.carousel-stage[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.project-carousel-item {
+  left: 50%;
+  opacity: 0;
+  filter: brightness(0.46) saturate(0.42);
+  pointer-events: none;
+  transition: none;
+  will-change: transform, opacity, filter;
+}
+
+.project-carousel-item[data-active="true"] {
+  pointer-events: auto;
+}
+
+.project-carousel-item[data-active="true"] a:hover .carousel-card {
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+.project-carousel-item[data-active="true"] a:hover img {
+  transform: scale(1.025);
+}
+
+.home-entry[data-bypass-intro="true"] {
+  height: auto;
+  overflow: visible;
+}
+
+.home-entry[data-bypass-intro="true"] > .home-portal {
+  position: relative;
+  width: 100%;
+  height: auto;
+  clip-path: none !important;
+  border-radius: 0 !important;
+  pointer-events: auto;
+  transform: none !important;
+  will-change: auto;
+}
+
+.home-entry[data-bypass-intro="true"] .work-index {
+  position: relative;
+  width: 100%;
+  filter: none !important;
+  transform: none !important;
+}
+
+.home-entry[data-bypass-intro="true"] .macbook-intro,
+.home-entry[data-bypass-intro="true"] .home-portal-glass {
+  display: none;
+}
+
 @media (max-width: 760px) {
   .work-index {
     gap: 1.2rem;
@@ -393,6 +462,10 @@
   .carousel-card,
   .carousel-card img {
     transition-duration: 1ms;
+  }
+
+  .carousel-controls button:nth-child(2) {
+    display: none;
   }
 }
 
@@ -2027,8 +2100,8 @@ p {
   visibility: hidden;
   grid-template-rows: auto 1fr auto;
   padding: 1.6rem var(--page-pad) 2rem;
-  background: #eeeeea;
-  color: #050505;
+  background: #0a0a0a;
+  color: #f3f3f0;
   pointer-events: none;
   transform: translateY(102%);
 }
@@ -2073,14 +2146,14 @@ p {
 .route-transition-rail {
   height: 1px;
   overflow: hidden;
-  background: rgba(5, 5, 5, 0.2);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .route-transition-rail span {
   display: block;
   width: 100%;
   height: 100%;
-  background: #050505;
+  background: #f3f3f0;
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -2089,19 +2162,19 @@ p {
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
-  transition: transform 520ms var(--ease-premium), visibility 0ms;
+  transition: transform 650ms var(--ease-premium), visibility 0ms;
 }
 
 .route-transition[data-phase="covering"] .route-transition-rail span {
   transform: scaleX(0.72);
-  transition: transform 520ms cubic-bezier(0.2, 0.76, 0.24, 1);
+  transition: transform 650ms cubic-bezier(0.2, 0.76, 0.24, 1);
 }
 
 .route-transition[data-phase="revealing"] {
   visibility: visible;
   pointer-events: auto;
   transform: translateY(-102%);
-  transition: transform 720ms var(--ease-premium), visibility 720ms;
+  transition: transform 850ms var(--ease-premium), visibility 850ms;
 }
 
 .route-transition[data-phase="revealing"] .route-transition-rail span {
@@ -3460,6 +3533,11 @@ body[data-loaded="true"] .macbook-intro-copy > *:nth-child(3) {
     grid-template-rows: auto auto auto;
     gap: 2rem;
     padding-top: 7.5rem;
+  }
+
+  .home-portal > .work-index {
+    height: auto;
+    min-height: 0;
   }
 
   .project-rail {

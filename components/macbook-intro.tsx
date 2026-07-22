@@ -90,6 +90,22 @@ function coverQuad(
   ];
 }
 
+function focusCoveredQuad(corners: PortalPoint[]): PortalPoint[] {
+  const center = corners.reduce(
+    (sum, corner) => ({ x: sum.x + corner.x / corners.length, y: sum.y + corner.y / corners.length }),
+    { x: 0, y: 0 },
+  );
+  const overscanned = corners.map((corner) => scaleFrom(center, corner, 1.028));
+  const horizontal = {
+    x: (overscanned[1].x - overscanned[0].x) * 0.024,
+    y: (overscanned[1].y - overscanned[0].y) * 0.024,
+  };
+  return overscanned.map((corner) => ({
+    x: corner.x + horizontal.x,
+    y: corner.y + horizontal.y,
+  }));
+}
+
 function portalMatrix(width: number, height: number, corners: PortalPoint[]) {
   const [topLeft, topRight, bottomRight, bottomLeft] = corners;
   const dx1 = topRight.x - bottomRight.x;
@@ -161,6 +177,23 @@ export function MacbookIntro() {
       document.body.style.removeProperty("--product-ui-progress");
       window.dispatchEvent(new Event("dhrex:model-ready"));
     };
+
+    let bypassIntro = Boolean(window.__dhrexInternalNavigation);
+    try {
+      bypassIntro ||= sessionStorage.getItem("dhrex-bypass-intro-once") === "1";
+      if (bypassIntro) sessionStorage.removeItem("dhrex-bypass-intro-once");
+    } catch {
+      // The in-memory marker remains available in restricted storage contexts.
+    }
+
+    if (bypassIntro) {
+      section.current.dataset.modelReady = "true";
+      section.current.dataset.bypass = "true";
+      homeEntry?.setAttribute("data-bypass-intro", "true");
+      if (workIndex) workIndex.inert = false;
+      window.dispatchEvent(new Event("dhrex:model-ready"));
+      return;
+    }
 
     if (simplified) {
       section.current.dataset.simplified = "true";
@@ -303,30 +336,34 @@ export function MacbookIntro() {
       // the display is facing the camera enough to contain the projected page.
       portalViewport.style.visibility = screenPresence > 0.16 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
+      const portalRect = portalViewport.getBoundingClientRect();
+      const canvasRect = canvas.current.getBoundingClientRect();
+      const sourceWidth = workIndex.offsetWidth;
+      const sourceHeight = workIndex.offsetHeight;
       const projectedCorners = displayLocalCorners.map((localCorner) => {
         const point = localCorner.clone();
         screenMesh!.localToWorld(point).project(camera);
         return {
-          x: (point.x + 1) * window.innerWidth / 2,
-          y: (1 - point.y) * window.innerHeight / 2,
+          x: canvasRect.left - portalRect.left + (point.x + 1) * canvasRect.width / 2,
+          y: canvasRect.top - portalRect.top + (1 - point.y) * canvasRect.height / 2,
         };
       });
       const portalProgress = easeInOut(clamp((revealProgress - 0.58) / 0.36));
       const viewportCorners = [
         { x: 0, y: 0 },
-        { x: window.innerWidth, y: 0 },
-        { x: window.innerWidth, y: window.innerHeight },
-        { x: 0, y: window.innerHeight },
+        { x: portalRect.width, y: 0 },
+        { x: portalRect.width, y: portalRect.height },
+        { x: 0, y: portalRect.height },
       ];
       const clipCorners = projectedCorners.map((corner, index) => ({
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
       }));
-      const coveredCorners = coverQuad(
+      const coveredCorners = focusCoveredQuad(coverQuad(
         projectedCorners,
-        window.innerWidth / window.innerHeight,
+        sourceWidth / sourceHeight,
         displayAspect,
-      );
+      ));
       const contentCorners = coveredCorners.map((corner, index) => ({
         x: THREE.MathUtils.lerp(corner.x, viewportCorners[index].x, portalProgress),
         y: THREE.MathUtils.lerp(corner.y, viewportCorners[index].y, portalProgress),
@@ -337,8 +374,8 @@ export function MacbookIntro() {
       const displayPresence = easeInOut(screenPresence);
       workIndex.style.filter = `brightness(${THREE.MathUtils.lerp(0.78, 1, displayPresence)})`;
       workIndex.style.transform = portalMatrix(
-        window.innerWidth,
-        window.innerHeight,
+        sourceWidth,
+        sourceHeight,
         contentCorners,
       );
       portalViewport.style.filter = portalProgress < 0.98

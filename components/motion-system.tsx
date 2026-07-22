@@ -6,8 +6,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const BOOKING_EVENT = "dhrex:open-booking";
 
+declare global {
+  interface Window {
+    __dhrexInternalNavigation?: boolean;
+  }
+}
+
 export function openBooking() {
   window.dispatchEvent(new Event(BOOKING_EVENT));
+}
+
+function markInternalNavigation() {
+  window.__dhrexInternalNavigation = true;
+  try {
+    sessionStorage.setItem("dhrex-bypass-intro-once", "1");
+  } catch {
+    // The in-memory marker still covers normal client navigation.
+  }
 }
 
 function routeName(pathname: string) {
@@ -107,7 +122,7 @@ export function MotionSystem() {
           setTransition("idle");
           navigationPending.current = false;
           delete document.body.dataset.routeTransition;
-        }, 760);
+        }, 900);
       });
     });
     return () => {
@@ -120,6 +135,7 @@ export function MotionSystem() {
     const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     const onPopState = () => {
+      markInternalNavigation();
       navigationPending.current = true;
       document.body.dataset.routeTransition = "true";
       lenis.current?.stop();
@@ -153,10 +169,22 @@ export function MotionSystem() {
       const destination = new URL(anchor.href, window.location.href);
       if (
         destination.origin !== window.location.origin ||
-        destination.pathname === window.location.pathname ||
         destination.protocol === "mailto:" ||
         destination.protocol === "tel:"
       ) {
+        return;
+      }
+
+      if (destination.pathname === "/") markInternalNavigation();
+      if (destination.pathname === window.location.pathname) {
+        if (destination.pathname === "/") {
+          event.preventDefault();
+          const homeEntry = document.querySelector<HTMLElement>(".home-entry");
+          const livePosition = homeEntry
+            ? Math.max(homeEntry.offsetTop + homeEntry.offsetHeight - window.innerHeight - 2, 0)
+            : 0;
+          lenis.current?.scrollTo(livePosition, { duration: 0.9, force: true });
+        }
         return;
       }
 
@@ -170,12 +198,12 @@ export function MotionSystem() {
       transitionTimer.current = window.setTimeout(() => {
         resetScrollState();
         router.push(`${destination.pathname}${destination.search}${destination.hash}`, { scroll: false });
-      }, 520);
+      }, 650);
     };
 
-    document.addEventListener("click", onClick);
+    document.addEventListener("click", onClick, true);
     return () => {
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("click", onClick, true);
     };
   }, [resetScrollState, router]);
 
