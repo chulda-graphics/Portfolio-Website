@@ -1801,6 +1801,7 @@ body[data-route-transition="true"] {
   background: rgba(5, 5, 5, 0);
   transition:
     height 360ms var(--ease-premium),
+    opacity 240ms ease,
     background 320ms ease,
     border-color 320ms ease,
     backdrop-filter 320ms ease;
@@ -1902,7 +1903,7 @@ body[data-scrolled="true"] .site-header {
 /* MacBook entry */
 .home-entry {
   position: relative;
-  height: 290svh;
+  height: 380svh;
   overflow: clip;
   background:
     radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.065), transparent 34%),
@@ -1975,6 +1976,21 @@ body[data-scrolled="true"] .site-header {
   left: var(--page-pad);
   max-width: 32rem;
   transform: translateY(-50%);
+}
+
+body[data-product-intro="true"] .site-header {
+  opacity: var(--product-ui-progress, 0);
+  pointer-events: none;
+}
+
+body[data-product-intro="true"] .custom-cursor {
+  opacity: 0 !important;
+}
+
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .macbook-intro-copy {
+    display: none;
+  }
 }
 
 .macbook-intro-copy h1 {

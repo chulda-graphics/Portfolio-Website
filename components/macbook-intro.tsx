@@ -15,6 +15,8 @@ function easeInOut(value: number) {
     : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 }
 
+const CLOSED_LID_ROTATION = 1.92;
+
 function createStudioEnvironment() {
   const faces = [
     ["#d9d9d5", "#191919"],
@@ -68,7 +70,10 @@ export function MacbookIntro() {
         workIndex.style.removeProperty("border-radius");
         workIndex.style.removeProperty("transform");
         workIndex.style.removeProperty("transform-origin");
+        workIndex.style.removeProperty("visibility");
       }
+      delete document.body.dataset.productIntro;
+      document.body.style.removeProperty("--product-ui-progress");
       window.dispatchEvent(new Event("dhrex:model-ready"));
     };
 
@@ -106,6 +111,18 @@ export function MacbookIntro() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 100);
+    const revealCameraPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(1.5, 1.55, 7.2),
+      new THREE.Vector3(1.3, 1.36, 7.15),
+      new THREE.Vector3(0.82, 1.16, 7.1),
+      new THREE.Vector3(0.12, 1.02, 6.9),
+    ]);
+    const revealTargetPath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.03, 0.04, 0),
+      new THREE.Vector3(0.02, 0.12, 0.01),
+      new THREE.Vector3(-0.015, 0.22, 0.005),
+      new THREE.Vector3(0, 0.28, 0),
+    ]);
     const cameraPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0.12, 1.02, 6.9),
       new THREE.Vector3(0.07, 0.82, 4.7),
@@ -121,19 +138,21 @@ export function MacbookIntro() {
     camera.position.copy(cameraPath.getPoint(0));
     camera.lookAt(targetPath.getPoint(0));
 
+    const floatRig = new THREE.Group();
     const pivot = new THREE.Group();
     pivot.rotation.set(-0.025, -0.08, 0);
-    scene.add(pivot);
+    floatRig.add(pivot);
+    scene.add(floatRig);
     scene.add(new THREE.HemisphereLight(0xf4f4ef, 0x090909, 1.55));
-    const keyLight = new THREE.RectAreaLight(0xffffff, 8.5, 4.8, 3.2);
+    const keyLight = new THREE.RectAreaLight(0xffffff, 11.5, 4.8, 3.2);
     keyLight.position.set(2.8, 4.6, 4.2);
     keyLight.lookAt(0, 0.25, 0);
     scene.add(keyLight);
-    const fillLight = new THREE.RectAreaLight(0xc8d0d3, 3.2, 3.2, 4.5);
+    const fillLight = new THREE.RectAreaLight(0xc8d0d3, 4.8, 3.2, 4.5);
     fillLight.position.set(-3.8, 1.6, 3.1);
     fillLight.lookAt(0, 0.2, 0);
     scene.add(fillLight);
-    const rimLight = new THREE.DirectionalLight(0xffffff, 3.8);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 5.4);
     rimLight.position.set(-4.5, 3.2, -1.5);
     scene.add(rimLight);
 
@@ -142,9 +161,12 @@ export function MacbookIntro() {
 
     let model: THREE.Object3D | null = null;
     let screenMesh: THREE.Mesh | null = null;
+    let lidPivot: THREE.Group | null = null;
     let visible = true;
     let frame = 0;
     let progress = 0;
+    let pivotRotationX = -0.07;
+    let pivotRotationY = -0.2;
 
     const renderSize = () => {
       if (!section.current || !canvas.current) return;
@@ -157,6 +179,7 @@ export function MacbookIntro() {
 
     const updatePortal = (revealProgress: number) => {
       if (!workIndex || !screenMesh || !canvas.current) return;
+      workIndex.style.visibility = revealProgress > 0.01 ? "visible" : "hidden";
       pivot.updateMatrixWorld(true);
       screenMesh.geometry.computeBoundingBox();
       const bounds = screenMesh.geometry.boundingBox;
@@ -196,20 +219,41 @@ export function MacbookIntro() {
       const rect = section.current.getBoundingClientRect();
       const distance = Math.max(section.current.offsetHeight - window.innerHeight, 1);
       progress = clamp(-rect.top / distance);
-      const eased = easeInOut(progress);
-      camera.position.copy(cameraPath.getPoint(eased));
-      camera.lookAt(targetPath.getPoint(eased));
-      pivot.rotation.y = THREE.MathUtils.lerp(-0.08, 0, eased);
-      pivot.rotation.x = THREE.MathUtils.lerp(-0.03, 0, eased);
-      if (introCopy.current) {
-        const copyExit = easeInOut(clamp(progress / 0.24));
-        introCopy.current.style.transform = `translate3d(${-copyExit * 120}vw, -50%, 0)`;
+      const openingProgress = easeInOut(clamp(progress / 0.36));
+      const approachProgress = clamp((progress - 0.36) / 0.64);
+      const approachEased = easeInOut(approachProgress);
+      if (approachProgress <= 0) {
+        camera.position.copy(revealCameraPath.getPoint(openingProgress));
+        camera.lookAt(revealTargetPath.getPoint(openingProgress));
+      } else {
+        camera.position.copy(cameraPath.getPoint(approachEased));
+        camera.lookAt(targetPath.getPoint(approachEased));
       }
-      updatePortal(progress);
+      if (lidPivot) lidPivot.rotation.x = THREE.MathUtils.lerp(CLOSED_LID_ROTATION, 0, openingProgress);
+      pivotRotationY = approachProgress > 0
+        ? THREE.MathUtils.lerp(-0.08, 0, approachEased)
+        : THREE.MathUtils.lerp(-0.2, -0.08, openingProgress);
+      pivotRotationX = approachProgress > 0
+        ? THREE.MathUtils.lerp(-0.03, 0, approachEased)
+        : THREE.MathUtils.lerp(-0.07, -0.03, openingProgress);
+      const interfaceProgress = easeInOut(clamp((progress - 0.82) / 0.1));
+      if (progress < 0.92) {
+        document.body.dataset.productIntro = "true";
+        document.body.style.setProperty("--product-ui-progress", String(interfaceProgress));
+      } else {
+        delete document.body.dataset.productIntro;
+        document.body.style.removeProperty("--product-ui-progress");
+      }
+      updatePortal(approachProgress);
     };
 
-    const draw = () => {
+    const draw = (time: number) => {
       if (visible) {
+        const openingPresence = 1 - easeInOut(clamp((progress - 0.32) / 0.3));
+        floatRig.position.y = Math.sin(time * 0.00055) * 0.018 * openingPresence;
+        floatRig.rotation.z = Math.cos(time * 0.00042) * 0.004 * openingPresence;
+        pivot.rotation.x = pivotRotationX + Math.sin(time * 0.00038) * 0.004 * openingPresence;
+        pivot.rotation.y = pivotRotationY + Math.cos(time * 0.00031) * 0.006 * openingPresence;
         renderer.render(scene, camera);
       }
       frame = requestAnimationFrame(draw);
@@ -220,11 +264,14 @@ export function MacbookIntro() {
       "/models/macbook-pro-14-m5-v1.glb",
       (gltf) => {
         model = gltf.scene;
+        const lidParts: THREE.Object3D[] = [];
         model.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
           object.frustumCulled = true;
           object.geometry.computeBoundingBox();
           const geometrySize = object.geometry.boundingBox?.getSize(new THREE.Vector3());
+          const objectBounds = new THREE.Box3().setFromObject(object);
+          if (objectBounds.max.y > 0.025 && objectBounds.min.z < -0.1) lidParts.push(object);
           const isStructural = geometrySize ? Math.max(geometrySize.x, geometrySize.y, geometrySize.z) > 0.2 : false;
           const materials = Array.isArray(object.material) ? object.material : [object.material];
           materials.forEach((sourceMaterial, index) => {
@@ -253,14 +300,26 @@ export function MacbookIntro() {
               material instanceof THREE.MeshStandardMaterial &&
               (isStructural || material.metalness > 0.35)
             ) {
-              material.color.setHex(0x343436);
-              material.metalness = Math.max(material.metalness, 0.76);
-              material.roughness = Math.max(0.22, Math.min(material.roughness, 0.3));
-              material.envMapIntensity = 2.2;
+              material.color.setHex(0x3b3b3e);
+              material.metalness = Math.max(material.metalness, 0.8);
+              material.roughness = Math.max(0.2, Math.min(material.roughness, 0.28));
+              material.envMapIntensity = 3;
               material.needsUpdate = true;
             }
           });
         });
+
+        model.updateMatrixWorld(true);
+        lidPivot = new THREE.Group();
+        const lidGeometry = new THREE.Group();
+        const hinge = new THREE.Vector3(0, 0, -0.108);
+        lidPivot.position.copy(hinge);
+        lidGeometry.position.copy(hinge).multiplyScalar(-1);
+        model.add(lidPivot);
+        lidPivot.add(lidGeometry);
+        model.updateMatrixWorld(true);
+        lidParts.forEach((part) => lidGeometry.attach(part));
+        lidPivot.rotation.x = CLOSED_LID_ROTATION;
 
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
@@ -301,8 +360,11 @@ export function MacbookIntro() {
         workIndex.style.removeProperty("border-radius");
         workIndex.style.removeProperty("transform");
         workIndex.style.removeProperty("transform-origin");
+        workIndex.style.removeProperty("visibility");
         delete workIndex.dataset.portalLive;
       }
+      delete document.body.dataset.productIntro;
+      document.body.style.removeProperty("--product-ui-progress");
       studioEnvironment.dispose();
       scene.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
