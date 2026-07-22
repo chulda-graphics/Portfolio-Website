@@ -430,7 +430,15 @@ export function MacbookIntro() {
       ) return;
       // The DOM portal sits above WebGL, so keep it physically inside the lid until
       // the display is facing the camera enough to contain the projected page.
-      portalViewport.style.visibility = screenPresence > 0.28 ? "visible" : "hidden";
+      const liveProjectionReady = screenPresence > 0.82;
+      portalViewport.style.visibility = liveProjectionReady ? "visible" : "hidden";
+      if (!liveProjectionReady) {
+        workIndex.inert = true;
+        workIndex.dataset.portalLive = "false";
+        portalViewport.dataset.portalLive = "false";
+        canvas.current.style.visibility = "visible";
+        return;
+      }
       pivot.updateMatrixWorld(true);
       const portalRect = portalViewport.getBoundingClientRect();
       const canvasRect = canvas.current.getBoundingClientRect();
