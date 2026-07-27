@@ -8,15 +8,21 @@ real requirement.
 
 ```text
 app/
-  globals.css     Minimal reset and brand-reference tokens
-  layout.tsx      Root document and holding metadata
-  page.tsx        Single build-verification page
+  globals.css     Shared single-viewport entry and route-shell styles
+  layout.tsx      Root document and portfolio metadata
+  page.tsx        Minimal navigation-led homepage
+  work/           Work route shell
+  process/        Process route shell
+  about/          About route shell
+  contact/        Contact route shell
 assets/
   licenses/       Third-party asset licenses
 build/            Sites packaging integration
 docs/             Preserved creative, content, and architecture knowledge
 public/
   fonts/          DM Sans variable fonts
+components/
+  destination-page.tsx  Shared semantic shell for undeveloped destinations
 tests/            Minimal server-render and hosting checks
 worker/           Cloudflare-compatible application entry point
 ```
@@ -35,6 +41,7 @@ worker/           Cloudflare-compatible application entry point
 
 ## Deliberately absent
 
-There is currently no navigation system, project schema, case-study template,
-motion runtime, scrolling library, WebGL layer, carousel, contact integration,
-or Version 2 asset library. Those decisions belong to the new design brief.
+There is currently no project schema, case-study template, motion runtime,
+scrolling library, WebGL layer, carousel, contact integration, or Version 2
+asset library. The homepage navigation and four route shells are the only
+implemented interface. Everything else belongs to future dedicated briefs.

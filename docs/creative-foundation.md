@@ -80,6 +80,7 @@ References should inform quality and principles, never be copied literally.
 
 ## Version 2 guardrails
 
+- The Version 2 homepage is predominantly white with black text. This entry-page direction overrides the previous near-black palette.
 - Do not restore Version 1 code or assets by default.
 - Do not recreate the laptop intro, carousel, route transitions, or old case-study system unless the new brief explicitly calls for them.
 - Do not assume animation is automatically better than a simpler interaction.

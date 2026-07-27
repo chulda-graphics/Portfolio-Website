@@ -1,11 +1,9 @@
 # Dhrex Portfolio — Version 2 Foundation
 
-This repository has been intentionally reset. Version 1 has been retired, and
-no Version 2 design has been implemented yet.
-
-The current application is only a minimal, production-safe holding scaffold.
-Its purpose is to keep the project buildable while the new design brief is
-prepared.
+This repository contains the intentionally minimal Version 2 portfolio entry.
+Version 1 remains retired. The current implementation is a single-viewport,
+text-led homepage with direct links to lightweight route shells for Work,
+Process, About, and Contact.
 
 ## Preserved foundation
 
@@ -28,4 +26,5 @@ Validate the reset with:
 npm test
 ```
 
-Do not begin Version 2 implementation until a new design brief is approved.
+The destination routes are intentionally undesigned beyond the minimum needed
+for reliable navigation. Build them only from their future dedicated briefs.

@@ -23,27 +23,35 @@ async function render(pathname = "/") {
   );
 }
 
-test("Version 2 foundation server-renders", async () => {
+test("minimal homepage server-renders all destination links", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
 
   const html = await response.text();
-  assert.match(html, /Foundation ready/i);
-  assert.match(html, /Version 2/i);
-  assert.doesNotMatch(html, /MacBook|StillSearch|Demo Reel|Calendly/i);
+  for (const [label, href] of [
+    ["Work", "/work"],
+    ["Process", "/process"],
+    ["About", "/about"],
+    ["Contact", "/contact"],
+  ]) {
+    assert.match(html, new RegExp(`href=["']${href}["']`, "i"));
+    assert.match(html, new RegExp(`>${label}<`, "i"));
+  }
+  assert.doesNotMatch(html, /MacBook|loading-screen|carousel|custom-cursor/i);
 });
 
-for (const retiredRoute of [
-  "/about",
-  "/contact",
-  "/work/demo-reel-2026",
-  "/work/stillsearch",
+for (const [route, title] of [
+  ["/work", "Work"],
+  ["/process", "Process"],
+  ["/about", "About"],
+  ["/contact", "Contact"],
 ]) {
-  test(`retired route ${retiredRoute} is absent`, async () => {
-    const response = await render(retiredRoute);
-    assert.equal(response.status, 404);
+  test(`${route} destination is directly available`, async () => {
+    const response = await render(route);
+    assert.equal(response.status, 200);
+    assert.match(await response.text(), new RegExp(`>${title}<`, "i"));
   });
 }
 

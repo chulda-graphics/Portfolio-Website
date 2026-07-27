@@ -2,20 +2,19 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Dhrex — Version 2 Foundation",
-  description:
-    "The clean architectural foundation for the next version of Dhrex's portfolio.",
-  robots: {
-    index: false,
-    follow: false,
+  title: {
+    default: "Dhrex — SaaS Motion Designer",
+    template: "%s — Dhrex",
   },
+  description:
+    "Dhrex is a SaaS motion designer creating clear, purposeful product motion for software companies worldwide.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#050505",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
