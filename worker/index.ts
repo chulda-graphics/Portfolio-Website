@@ -1,4 +1,4 @@
-/** Cloudflare Worker entry point for the Dhrex portfolio. */
+/** Cloudflare Worker entry point for the Version 2 foundation. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 
@@ -13,7 +13,7 @@ interface Env {
   };
 }
 
-const IMMUTABLE_ASSET = /^\/(?:assets|fonts|frames|models)\/|^\/og-v\d+\.(?:avif|jpe?g|png|webp)$/i;
+const IMMUTABLE_ASSET = /^\/(?:assets|fonts)\//i;
 
 function applyDeliveryHeaders(request: Request, response: Response) {
   const headers = new Headers(response.headers);

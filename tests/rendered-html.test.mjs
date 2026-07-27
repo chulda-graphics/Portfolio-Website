@@ -23,38 +23,31 @@ async function render(pathname = "/") {
   );
 }
 
-const routes = [
-  ["/", /Clarity,|selected work/i],
-  ["/about", /shape how people experience software/i],
-  ["/contact", /Bring clarity to your product/i],
-  ["/work/demo-reel-2026", /Demo Reel 2026/i],
-  ["/work/stillsearch", /StillSearch/i],
-];
+test("Version 2 foundation server-renders", async () => {
+  const response = await render();
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
 
-for (const [route, expectation] of routes) {
-  test(`server-renders ${route}`, async () => {
-    const response = await render(route);
-    assert.equal(response.status, 200);
-    assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
-    assert.match(response.headers.get("cache-control") ?? "", /must-revalidate/);
-    assert.match(response.headers.get("cdn-cache-control") ?? "", /stale-while-revalidate/);
+  const html = await response.text();
+  assert.match(html, /Foundation ready/i);
+  assert.match(html, /Version 2/i);
+  assert.doesNotMatch(html, /MacBook|StillSearch|Demo Reel|Calendly/i);
+});
 
-    const html = await response.text();
-    assert.match(html, expectation);
-    assert.match(html, /Dhrex/i);
-    assert.doesNotMatch(html, /codex-preview|Starter Project|Your site is taking shape/i);
+for (const retiredRoute of [
+  "/about",
+  "/contact",
+  "/work/demo-reel-2026",
+  "/work/stillsearch",
+]) {
+  test(`retired route ${retiredRoute} is absent`, async () => {
+    const response = await render(retiredRoute);
+    assert.equal(response.status, 404);
   });
 }
 
-test("coming-soon work remains inert", async () => {
-  const response = await render("/");
-  const html = await response.text();
-  assert.match(html, /Coming Soon/);
-  assert.doesNotMatch(html, /href=["'][^"']*coming-soon/i);
-});
-
-test("Cloudflare image and asset bindings are emitted", async () => {
+test("Cloudflare bindings are emitted", async () => {
   const config = JSON.parse(
     await readFile(new URL("../dist/server/wrangler.json", import.meta.url), "utf8"),
   );
