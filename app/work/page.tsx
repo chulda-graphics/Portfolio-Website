@@ -29,16 +29,10 @@ export default function WorkPage() {
         </p>
       </section>
 
-      <section className="work-ledger" aria-label="Selected projects">
-        <article className="work-entry work-entry-featured">
-          <div className="work-entry-heading">
-            <p>{projects.stillsearch.index} / 02</p>
-            <h2>{projects.stillsearch.title}</h2>
-            <p>{projects.stillsearch.descriptor}</p>
-          </div>
-
+      <section className="work-showcase" aria-label="Selected projects">
+        <article className="work-project">
           <Link
-            className="work-media-link"
+            className="work-project-link"
             href={`/work/${projects.stillsearch.slug}`}
             aria-label="View the StillSearch case study"
           >
@@ -46,40 +40,40 @@ export default function WorkPage() {
               src={projects.stillsearch.video}
               label="StillSearch launch film preview"
             />
+            <div className="work-project-topline">
+              <span>{projects.stillsearch.index} / 02</span>
+              <span>{projects.stillsearch.descriptor}</span>
+              <span>{projects.stillsearch.year}</span>
+            </div>
+            <div className="work-project-heading">
+              <p>{projects.stillsearch.role}</p>
+              <h2>{projects.stillsearch.title}</h2>
+              <span aria-hidden="true">↗</span>
+            </div>
           </Link>
-
-          <div className="work-entry-meta">
-            <p>{projects.stillsearch.role}</p>
-            <p>{projects.stillsearch.year}</p>
-            <Link href={`/work/${projects.stillsearch.slug}`}>
-              View case study ↗
-            </Link>
-          </div>
         </article>
 
-        <article className="work-entry work-entry-secondary">
-          <div className="work-entry-heading">
-            <p>{projects.demoReel.index} / 02</p>
-            <h2>{projects.demoReel.title}</h2>
-            <p>{projects.demoReel.descriptor}</p>
-          </div>
-
+        <article className="work-project">
           <Link
-            className="work-media-link"
+            className="work-project-link"
             href={`/work/${projects.demoReel.slug}`}
-            aria-label="View the Demo Reel 2026 case study"
+            aria-label="View the Demo Reel 2026 project"
           >
             <ProjectVideo
               src={projects.demoReel.video}
               label="Demo Reel 2026 preview"
             />
+            <div className="work-project-topline">
+              <span>{projects.demoReel.index} / 02</span>
+              <span>{projects.demoReel.descriptor}</span>
+              <span>{projects.demoReel.year}</span>
+            </div>
+            <div className="work-project-heading">
+              <p>{projects.demoReel.role}</p>
+              <h2>{projects.demoReel.title}</h2>
+              <span aria-hidden="true">↗</span>
+            </div>
           </Link>
-
-          <div className="work-entry-meta">
-            <p>{projects.demoReel.role}</p>
-            <p>{projects.demoReel.year}</p>
-            <Link href={`/work/${projects.demoReel.slug}`}>View project ↗</Link>
-          </div>
         </article>
       </section>
 

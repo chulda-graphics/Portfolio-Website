@@ -13,7 +13,7 @@ type MotionExperienceProps = {
 };
 
 const revealSelector = [
-  ".work-entry",
+  ".work-project",
   ".closing-statement",
   ".process-list",
   ".process-principle",
@@ -201,6 +201,21 @@ export function MotionExperience({ children }: MotionExperienceProps) {
       }
 
       if (!reducedMotion) {
+        if (isHome) {
+          gsap.fromTo(
+            ".home-header > *, .home-navigation li, .home-footer > *",
+            { autoAlpha: 0, y: 16 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.62,
+              stagger: 0.055,
+              ease: "power3.out",
+              delay: isFirstRender ? 1.72 : 0.04,
+            },
+          );
+        }
+
         const headings = root.querySelectorAll<HTMLElement>(headingSelector);
 
         headings.forEach((heading) => {

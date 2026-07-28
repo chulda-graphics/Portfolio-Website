@@ -71,12 +71,15 @@ export default function ProcessPage() {
       </section>
 
       <section className="process-list" aria-label="Working process">
-        {phases.map((phase) => (
-          <article key={phase.index}>
-            <p>{phase.index}</p>
-            <h2>{phase.title}</h2>
+        {phases.map((phase, index) => (
+          <details key={phase.index} open={index === 0 ? true : undefined}>
+            <summary>
+              <span>{phase.index}</span>
+              <span className="process-title">{phase.title}</span>
+              <span className="process-indicator" aria-hidden="true" />
+            </summary>
             <p>{phase.copy}</p>
-          </article>
+          </details>
         ))}
       </section>
 

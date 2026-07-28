@@ -1,10 +1,30 @@
 import Link from "next/link";
 
 const destinations = [
-  { index: "01", label: "Work", href: "/work" },
-  { index: "02", label: "Process", href: "/process" },
-  { index: "03", label: "About", href: "/about" },
-  { index: "04", label: "Contact", href: "/contact" },
+  {
+    index: "01",
+    label: "Work",
+    href: "/work",
+    note: "Selected motion and launch films",
+  },
+  {
+    index: "02",
+    label: "Process",
+    href: "/process",
+    note: "From product understanding to delivery",
+  },
+  {
+    index: "03",
+    label: "About",
+    href: "/about",
+    note: "A precise, purpose-led practice",
+  },
+  {
+    index: "04",
+    label: "Contact",
+    href: "/contact",
+    note: "Start a project with Dhrex",
+  },
 ];
 
 export default function HomePage() {
@@ -20,12 +40,17 @@ export default function HomePage() {
           {destinations.map((destination) => (
             <li key={destination.href}>
               <Link href={destination.href}>
-                <span className="navigation-index" aria-hidden="true">
-                  {destination.index}
+                <span className="navigation-meta">
+                  <span className="navigation-index" aria-hidden="true">
+                    {destination.index}
+                  </span>
+                  <span className="navigation-note">{destination.note}</span>
                 </span>
-                <span>{destination.label}</span>
-                <span className="navigation-arrow" aria-hidden="true">
-                  ↗
+                <span className="navigation-label">
+                  {destination.label}
+                  <span className="navigation-arrow" aria-hidden="true">
+                    ↗
+                  </span>
                 </span>
               </Link>
             </li>
