@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type SiteHeaderProps = {
   current?: "work" | "process" | "about" | "contact";
 };
@@ -10,21 +12,11 @@ const navigation = [
 ] as const;
 
 export function SiteHeader({ current }: SiteHeaderProps) {
-  const currentLabel =
-    navigation.find((item) => item.key === current)?.label ?? "Index";
-
   return (
     <header className="site-header">
-      <div className="site-rail">
-        <a className="site-wordmark" href="/" aria-label="Dhrex — homepage">
-          Dhrex
-        </a>
-        <p className="site-rail-section">{currentLabel}</p>
-      </div>
-
-      <a className="site-mobile-wordmark" href="/" aria-label="Dhrex — homepage">
+      <Link className="site-mobile-wordmark" href="/" aria-label="Dhrex — homepage">
         Dhrex
-      </a>
+      </Link>
 
       <p className="site-discipline">SaaS Motion Designer</p>
 
@@ -32,12 +24,12 @@ export function SiteHeader({ current }: SiteHeaderProps) {
         <ul>
           {navigation.map((item) => (
             <li key={item.href}>
-              <a
+              <Link
                 href={item.href}
                 aria-current={current === item.key ? "page" : undefined}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

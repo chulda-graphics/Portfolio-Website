@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProjectVideo } from "@/components/project-video";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -36,7 +37,7 @@ export default function WorkPage() {
             <p>{projects.stillsearch.descriptor}</p>
           </div>
 
-          <a
+          <Link
             className="work-media-link"
             href={`/work/${projects.stillsearch.slug}`}
             aria-label="View the StillSearch case study"
@@ -45,12 +46,14 @@ export default function WorkPage() {
               src={projects.stillsearch.video}
               label="StillSearch launch film preview"
             />
-          </a>
+          </Link>
 
           <div className="work-entry-meta">
             <p>{projects.stillsearch.role}</p>
             <p>{projects.stillsearch.year}</p>
-            <a href={`/work/${projects.stillsearch.slug}`}>View case study ↗</a>
+            <Link href={`/work/${projects.stillsearch.slug}`}>
+              View case study ↗
+            </Link>
           </div>
         </article>
 
@@ -61,7 +64,7 @@ export default function WorkPage() {
             <p>{projects.demoReel.descriptor}</p>
           </div>
 
-          <a
+          <Link
             className="work-media-link"
             href={`/work/${projects.demoReel.slug}`}
             aria-label="View the Demo Reel 2026 case study"
@@ -70,12 +73,12 @@ export default function WorkPage() {
               src={projects.demoReel.video}
               label="Demo Reel 2026 preview"
             />
-          </a>
+          </Link>
 
           <div className="work-entry-meta">
             <p>{projects.demoReel.role}</p>
             <p>{projects.demoReel.year}</p>
-            <a href={`/work/${projects.demoReel.slug}`}>View project ↗</a>
+            <Link href={`/work/${projects.demoReel.slug}`}>View project ↗</Link>
           </div>
         </article>
       </section>

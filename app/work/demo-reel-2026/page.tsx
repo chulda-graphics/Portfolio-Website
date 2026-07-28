@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProjectVideo } from "@/components/project-video";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -90,7 +91,7 @@ export default function DemoReelPage() {
 
       <nav className="next-project" aria-label="Next project">
         <p>Next project / 01</p>
-        <a href="/work/stillsearch">StillSearch ↗</a>
+        <Link href="/work/stillsearch">StillSearch ↗</Link>
       </nav>
 
       <SiteFooter />

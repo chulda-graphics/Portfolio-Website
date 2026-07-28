@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProjectVideo } from "@/components/project-video";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -115,7 +116,7 @@ export default function StillSearchPage() {
 
       <nav className="next-project" aria-label="Next project">
         <p>Next project / 02</p>
-        <a href="/work/demo-reel-2026">Demo Reel 2026 ↗</a>
+        <Link href="/work/demo-reel-2026">Demo Reel 2026 ↗</Link>
       </nav>
 
       <SiteFooter />

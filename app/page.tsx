@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const destinations = [
   { index: "01", label: "Work", href: "/work" },
   { index: "02", label: "Process", href: "/process" },
@@ -17,7 +19,7 @@ export default function HomePage() {
         <ul>
           {destinations.map((destination) => (
             <li key={destination.href}>
-              <a href={destination.href}>
+              <Link href={destination.href}>
                 <span className="navigation-index" aria-hidden="true">
                   {destination.index}
                 </span>
@@ -25,7 +27,7 @@ export default function HomePage() {
                 <span className="navigation-arrow" aria-hidden="true">
                   ↗
                 </span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
