@@ -10,7 +10,7 @@ export default function HomePage() {
     <main className="home-shell">
       <header className="home-header">
         <p className="home-name">Dhrex</p>
-        <p className="home-role">SaaS Motion Designer</p>
+        <p className="home-role">Premium SaaS Motion Graphics</p>
       </header>
 
       <nav className="home-navigation" aria-label="Portfolio sections">
@@ -32,7 +32,7 @@ export default function HomePage() {
       </nav>
 
       <footer className="home-footer">
-        <p>Portfolio / 2026</p>
+        <p>Independent portfolio / 2026</p>
         <p>Remote worldwide</p>
       </footer>
     </main>

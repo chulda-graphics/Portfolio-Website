@@ -23,7 +23,7 @@ async function render(pathname = "/") {
   );
 }
 
-test("minimal homepage server-renders all destination links", async () => {
+test("non-scrolling homepage server-renders only the portfolio index", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -40,13 +40,16 @@ test("minimal homepage server-renders all destination links", async () => {
     assert.match(html, new RegExp(`>${label}<`, "i"));
   }
   assert.doesNotMatch(html, /MacBook|loading-screen|carousel|custom-cursor/i);
+  assert.doesNotMatch(html, /<video|Motion gives software|Selected projects/i);
 });
 
 for (const [route, title] of [
-  ["/work", "Work"],
+  ["/work", "Motion gives"],
   ["/process", "Process"],
   ["/about", "About"],
   ["/contact", "Contact"],
+  ["/work/stillsearch", "StillSearch"],
+  ["/work/demo-reel-2026", "Demo Reel"],
 ]) {
   test(`${route} destination is directly available`, async () => {
     const response = await render(route);
@@ -54,6 +57,15 @@ for (const [route, title] of [
     assert.match(await response.text(), new RegExp(`>${title}<`, "i"));
   });
 }
+
+test("work pages include both existing project films", async () => {
+  const response = await render("/work");
+  const html = await response.text();
+  assert.match(html, /StillSearch%20Launch%20Video\.mp4/i);
+  assert.match(html, /Video%20Demo%20Reel%202026\.mp4/i);
+  assert.match(html, /href=["']\/work\/stillsearch["']/i);
+  assert.match(html, /href=["']\/work\/demo-reel-2026["']/i);
+});
 
 test("Cloudflare bindings are emitted", async () => {
   const config = JSON.parse(

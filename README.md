@@ -1,9 +1,9 @@
-# Dhrex Portfolio — Version 2 Foundation
+# Dhrex Portfolio — Version 2
 
-This repository contains the intentionally minimal Version 2 portfolio entry.
-Version 1 remains retired. The current implementation is a single-viewport,
-text-led homepage with direct links to lightweight route shells for Work,
-Process, About, and Contact.
+This repository contains the complete Version 2 editorial portfolio. The
+homepage remains an intentionally minimal, single-viewport index. Work,
+Process, About, and Contact contain the long-form portfolio experience, with
+dedicated case studies for StillSearch and Demo Reel 2026.
 
 ## Preserved foundation
 
@@ -20,11 +20,11 @@ npm install
 npm run dev
 ```
 
-Validate the reset with:
+Validate the site with:
 
 ```bash
 npm test
 ```
 
-The destination routes are intentionally undesigned beyond the minimum needed
-for reliable navigation. Build them only from their future dedicated briefs.
+All project films remain on external media delivery rather than in the Worker
+bundle.
