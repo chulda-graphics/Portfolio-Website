@@ -10,9 +10,20 @@ const navigation = [
 ] as const;
 
 export function SiteHeader({ current }: SiteHeaderProps) {
+  const currentLabel =
+    navigation.find((item) => item.key === current)?.label ?? "Index";
+
   return (
     <header className="site-header">
-      <a className="site-wordmark" href="/" aria-label="Dhrex — homepage">
+      <div className="site-rail">
+        <a className="site-wordmark" href="/" aria-label="Dhrex — homepage">
+          Dhrex
+        </a>
+        <p className="site-rail-section">{currentLabel}</p>
+        <p className="site-rail-mark" aria-hidden="true">↘</p>
+      </div>
+
+      <a className="site-mobile-wordmark" href="/" aria-label="Dhrex — homepage">
         Dhrex
       </a>
 

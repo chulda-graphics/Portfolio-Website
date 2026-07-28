@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { MotionExperience } from "@/components/motion-experience";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -47,7 +48,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <MotionExperience>{children}</MotionExperience>
+      </body>
     </html>
   );
 }

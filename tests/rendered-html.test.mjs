@@ -23,7 +23,7 @@ async function render(pathname = "/") {
   );
 }
 
-test("non-scrolling homepage server-renders only the portfolio index", async () => {
+test("non-scrolling homepage server-renders the portfolio index and intro shell", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -39,6 +39,8 @@ test("non-scrolling homepage server-renders only the portfolio index", async () 
     assert.match(html, new RegExp(`href=["']${href}["']`, "i"));
     assert.match(html, new RegExp(`>${label}<`, "i"));
   }
+  assert.match(html, /class=["']site-loader["']/i);
+  assert.match(html, /class=["']scroll-progress["']/i);
   assert.doesNotMatch(html, /MacBook|loading-screen|carousel|custom-cursor/i);
   assert.doesNotMatch(html, /<video|Motion gives software|Selected projects/i);
 });
