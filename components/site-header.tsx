@@ -20,7 +20,6 @@ export function SiteHeader({ current }: SiteHeaderProps) {
           Dhrex
         </a>
         <p className="site-rail-section">{currentLabel}</p>
-        <p className="site-rail-mark" aria-hidden="true">↘</p>
       </div>
 
       <a className="site-mobile-wordmark" href="/" aria-label="Dhrex — homepage">

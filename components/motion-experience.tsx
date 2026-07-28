@@ -40,7 +40,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLSpanElement>(null);
   const routeRef = useRef<HTMLDivElement>(null);
   const hasMounted = useRef(false);
 
@@ -49,10 +48,9 @@ export function MotionExperience({ children }: MotionExperienceProps) {
 
     const root = rootRef.current;
     const loader = loaderRef.current;
-    const progress = progressRef.current;
     const route = routeRef.current;
 
-    if (!root || !loader || !progress || !route) return;
+    if (!root || !loader || !route) return;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -64,8 +62,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     const hoverCleanups: Array<() => void> = [];
 
     const context = gsap.context(() => {
-      gsap.set(progress, { scaleX: 0, transformOrigin: "left center" });
-
       if (reducedMotion) {
         route.inert = false;
         gsap.set(loader, { display: "none" });
@@ -95,16 +91,10 @@ export function MotionExperience({ children }: MotionExperienceProps) {
             { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 },
             0.18,
           )
-          .fromTo(
-            ".loader-rule-fill",
-            { scaleX: 0 },
-            { scaleX: 1, duration: 1.05, ease: "power2.inOut" },
-            0.08,
-          )
           .to(
             ".loader-word",
             {
-              letterSpacing: "-0.075em",
+              letterSpacing: "-0.045em",
               scale: 0.985,
               duration: 0.55,
               ease: "power2.inOut",
@@ -219,16 +209,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         }
       }
 
-      gsap.to(progress, {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: document.documentElement,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: reducedMotion ? false : 0.15,
-        },
-      });
     }, root);
 
     return () => {
@@ -242,10 +222,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
 
   return (
     <div className="experience-root" ref={rootRef}>
-      <div className="scroll-progress" aria-hidden="true">
-        <span ref={progressRef} />
-      </div>
-
       <div className="site-loader" ref={loaderRef} aria-hidden="true">
         <div className="loader-meta">
           <p>Dhrex / 2026</p>
@@ -254,9 +230,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         <p className="loader-word">
           <span>Dhrex</span>
         </p>
-        <div className="loader-rule">
-          <span className="loader-rule-fill" />
-        </div>
       </div>
 
       <div className="route-content" key={pathname} ref={routeRef}>

@@ -1,16 +1,24 @@
 @font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/dm-sans-variable.ttf") format("truetype");
+  font-family: "Neue Haas Grotesk";
+  src:
+    local("Neue Haas Grotesk Text Pro"),
+    local("Neue Haas Grotesk Text"),
+    local("Neue Haas Grotesk Display Pro"),
+    local("Neue Haas Grotesk");
   font-style: normal;
-  font-weight: 100 1000;
+  font-weight: 100 900;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/dm-sans-italic-variable.ttf") format("truetype");
+  font-family: "Neue Haas Grotesk";
+  src:
+    local("Neue Haas Grotesk Text Pro Italic"),
+    local("Neue Haas Grotesk Text Italic"),
+    local("Neue Haas Grotesk Display Pro Italic"),
+    local("Neue Haas Grotesk Italic");
   font-style: italic;
-  font-weight: 100 1000;
+  font-weight: 100 900;
   font-display: swap;
 }
 
@@ -41,7 +49,13 @@ body {
   overflow-x: clip;
   background: var(--paper);
   color: var(--ink);
-  font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    "Neue Haas Grotesk",
+    "Neue Haas Grotesk Text Pro",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -60,7 +74,7 @@ body.is-intro-playing {
   inset: 0;
   z-index: 1000;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
   overflow: hidden;
   padding: clamp(1.25rem, 3.25vw, 3.75rem);
   background: #0a0a0a;
@@ -92,37 +106,6 @@ body.is-intro-playing {
 
 .loader-word span {
   display: block;
-}
-
-.loader-rule {
-  height: 1px;
-  overflow: hidden;
-  background: #292929;
-}
-
-.loader-rule-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  transform-origin: left center;
-}
-
-.scroll-progress {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 120;
-  height: 2px;
-  pointer-events: none;
-}
-
-.scroll-progress span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left center;
 }
 
 .motion-line {
@@ -976,6 +959,110 @@ a:focus-visible {
   opacity: 0.5;
 }
 
+/* Soft editorial system: whitespace creates structure instead of visible UI rules. */
+.home-navigation li,
+.home-navigation li:last-child,
+.site-header,
+.site-rail,
+.editorial-hero,
+.work-entry-meta,
+.closing-statement,
+.site-footer,
+.process-list,
+.process-list article,
+.about-opening,
+.about-grid,
+.about-manifesto,
+.contact-actions a,
+.contact-footer,
+.case-facts > div,
+.case-narrative,
+.case-process,
+.case-process li,
+.case-process li:last-child,
+.case-quote,
+.next-project {
+  border: 0;
+}
+
+.home-navigation ul {
+  display: grid;
+  gap: clamp(0.1rem, 0.8svh, 0.65rem);
+}
+
+.home-navigation a {
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 0;
+  letter-spacing: -0.052em;
+  line-height: 0.84;
+}
+
+.navigation-index,
+.navigation-arrow,
+.site-rail-mark {
+  display: none;
+}
+
+.work-entry-meta {
+  padding-top: 0.5rem;
+}
+
+.process-list article {
+  min-height: 10.5rem;
+  padding-block: 2.6rem;
+}
+
+.case-facts > div,
+.case-process li {
+  padding-top: 0;
+}
+
+.closing-statement > a,
+.contact-actions a {
+  padding-block: 0.25rem;
+}
+
+.editorial-hero h1,
+.work-entry-heading h2,
+.closing-statement h2,
+.process-list h2,
+.process-principle > p:last-child,
+.about-opening h1,
+.about-lead,
+.about-manifesto > p:last-child,
+.contact-main h1,
+.case-heading h1,
+.case-narrative h2,
+.case-statement > p:last-child,
+.case-process h2,
+.case-quote > p,
+.next-project a {
+  letter-spacing: -0.045em;
+}
+
+.loader-word {
+  letter-spacing: -0.04em;
+}
+
+.home-header,
+.home-footer,
+.site-header,
+.eyebrow,
+.work-entry-heading > p:first-child,
+.site-footer,
+.site-rail-section,
+.case-section-number,
+.case-facts > div p:first-child,
+.next-project p {
+  letter-spacing: 0.045em;
+}
+
+.hero-note,
+.about-copy,
+.case-heading > p:last-child {
+  letter-spacing: -0.012em;
+}
+
 @media (max-width: 900px) {
   .page-shell {
     padding-inline: var(--page-margin);
@@ -1056,7 +1143,7 @@ a:focus-visible {
   }
 
   .home-navigation a {
-    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-shell {
