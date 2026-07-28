@@ -13,7 +13,7 @@ type MotionExperienceProps = {
 const revealSelector = [
   ".work-entry",
   ".closing-statement",
-  ".process-list article",
+  ".process-list",
   ".process-principle",
   ".about-grid",
   ".about-manifesto",
@@ -23,7 +23,7 @@ const revealSelector = [
   ".case-film",
   ".case-facts",
   ".case-narrative",
-  ".case-statement > *",
+  ".case-statement",
   ".case-process",
   ".case-quote",
   ".next-project",
@@ -59,8 +59,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     hasMounted.current = true;
     const hasSeenIntro = window.sessionStorage.getItem("dhrex-intro-seen") === "1";
     const splits: SplitText[] = [];
-    const hoverCleanups: Array<() => void> = [];
-
     const context = gsap.context(() => {
       if (reducedMotion) {
         route.inert = false;
@@ -83,29 +81,33 @@ export function MotionExperience({ children }: MotionExperienceProps) {
           .fromTo(
             ".loader-word span",
             { yPercent: 115 },
-            { yPercent: 0, duration: 0.82 },
+            { yPercent: 0, duration: 0.64 },
           )
           .fromTo(
             ".loader-meta > *",
             { autoAlpha: 0, y: 8 },
-            { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 },
-            0.18,
+            { autoAlpha: 1, y: 0, duration: 0.32, stagger: 0.06 },
+            0.12,
           )
           .to(
             ".loader-word",
             {
               letterSpacing: "-0.045em",
               scale: 0.985,
-              duration: 0.55,
+              duration: 0.32,
               ease: "power2.inOut",
             },
-            0.7,
+            0.5,
           )
-          .to(loader, {
-            clipPath: "inset(0 0 100% 0)",
-            duration: 0.9,
-            ease: "power4.inOut",
-          })
+          .to(
+            loader,
+            {
+              clipPath: "inset(0 0 100% 0)",
+              duration: 0.68,
+              ease: "power4.inOut",
+            },
+            0.76,
+          )
           .set(loader, { display: "none" });
       } else {
         route.inert = false;
@@ -128,10 +130,10 @@ export function MotionExperience({ children }: MotionExperienceProps) {
             { yPercent: 108 },
             {
               yPercent: 0,
-              duration: 0.9,
-              stagger: 0.08,
+              duration: 0.75,
+              stagger: 0.06,
               ease: "power4.out",
-              delay: isFirstRender && !hasSeenIntro ? 1.45 : 0.08,
+              delay: isFirstRender && !hasSeenIntro ? 1.08 : 0.04,
             },
           );
         });
@@ -139,15 +141,15 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         gsap.utils.toArray<HTMLElement>(revealSelector).forEach((element) => {
           gsap.fromTo(
             element,
-            { autoAlpha: 0, y: 28 },
+            { autoAlpha: 0, y: 18 },
             {
               autoAlpha: 1,
               y: 0,
-              duration: 0.82,
+              duration: 0.68,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: element,
-                start: "top 88%",
+                start: "top 90%",
                 once: true,
               },
             },
@@ -165,47 +167,12 @@ export function MotionExperience({ children }: MotionExperienceProps) {
             {
               autoAlpha: 1,
               y: 0,
-              duration: 0.65,
-              stagger: 0.06,
+              duration: 0.5,
+              stagger: 0.045,
               ease: "power3.out",
-              delay: isFirstRender && !hasSeenIntro ? 1.6 : 0.05,
+              delay: isFirstRender && !hasSeenIntro ? 1.14 : 0.03,
             },
           );
-        }
-
-        if (window.matchMedia("(pointer: fine)").matches) {
-          root.querySelectorAll<HTMLElement>(".work-media-link").forEach((link) => {
-            const media = link.querySelector<HTMLElement>("video");
-            if (!media) return;
-
-            const moveX = gsap.quickTo(media, "x", {
-              duration: 0.55,
-              ease: "power3.out",
-            });
-            const moveY = gsap.quickTo(media, "y", {
-              duration: 0.55,
-              ease: "power3.out",
-            });
-
-            const handleMove = (event: PointerEvent) => {
-              const bounds = link.getBoundingClientRect();
-              const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-              const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-              moveX(x * 8);
-              moveY(y * 8);
-            };
-            const handleLeave = () => {
-              moveX(0);
-              moveY(0);
-            };
-
-            link.addEventListener("pointermove", handleMove);
-            link.addEventListener("pointerleave", handleLeave);
-            hoverCleanups.push(() => {
-              link.removeEventListener("pointermove", handleMove);
-              link.removeEventListener("pointerleave", handleLeave);
-            });
-          });
         }
       }
 
@@ -214,7 +181,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     return () => {
       document.body.classList.remove("is-intro-playing");
       route.inert = false;
-      hoverCleanups.forEach((cleanup) => cleanup());
       context.revert();
       splits.reverse().forEach((split) => split.revert());
     };
