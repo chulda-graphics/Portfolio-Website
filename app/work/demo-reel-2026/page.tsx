@@ -28,6 +28,7 @@ export default function DemoReelPage() {
         className="case-film"
         src={project.video}
         label="Dhrex Demo Reel 2026"
+        priority
       />
 
       <section className="case-facts" aria-label="Project details">

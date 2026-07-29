@@ -28,6 +28,7 @@ export default function StillSearchPage() {
         className="case-film"
         src={project.video}
         label="StillSearch product launch film"
+        priority
       />
 
       <section className="case-facts" aria-label="Project details">

@@ -68,6 +68,26 @@ test("work pages include both existing project films", async () => {
   assert.match(html, /href=["']\/work\/demo-reel-2026["']/i);
 });
 
+test("project films render with mobile-safe autoplay attributes", async () => {
+  for (const route of ["/work/stillsearch", "/work/demo-reel-2026"]) {
+    const response = await render(route);
+    const html = await response.text();
+    assert.match(html, /<video\b[^>]*autoplay/i);
+    assert.match(html, /<video\b[^>]*loop/i);
+    assert.match(html, /<video\b[^>]*muted/i);
+    assert.match(html, /<video\b[^>]*playsinline/i);
+    assert.match(html, /<video\b[^>]*preload=["']metadata["']/i);
+  }
+});
+
+test("process stages expose an accessible disclosure state", async () => {
+  const response = await render("/process");
+  const html = await response.text();
+  assert.match(html, /<button\b[^>]*aria-expanded=["']true["']/i);
+  assert.match(html, /aria-controls=["']process-panel-01["']/i);
+  assert.match(html, /id=["']process-panel-01["']/i);
+});
+
 test("Cloudflare bindings are emitted", async () => {
   const config = JSON.parse(
     await readFile(new URL("../dist/server/wrangler.json", import.meta.url), "utf8"),

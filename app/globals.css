@@ -367,16 +367,18 @@ a:focus-visible {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: clamp(2.55rem, min(4.9vw, 10svh), 5.7rem);
+  font-size: clamp(2.35rem, min(4.2vw, 9svh), 5.3rem);
   font-weight: 455;
-  letter-spacing: -0.052em;
-  line-height: 0.88;
+  letter-spacing: -0.04em;
+  line-height: 0.84;
+  text-transform: uppercase;
 }
 
 .navigation-arrow {
   font-size: 0.24em;
   font-weight: 500;
   letter-spacing: 0;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (hover: hover) and (min-width: 761px) {
@@ -480,11 +482,33 @@ a:focus-visible {
   gap: clamp(1.75rem, 3vw, 3.5rem);
 }
 
+.site-header nav a {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.35em;
+}
+
+.site-header nav a::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .site-header a:hover,
 .site-header a[aria-current="page"] {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.35em;
+  text-decoration: none;
+}
+
+.site-header nav a:hover::after,
+.site-header nav a:focus-visible::after,
+.site-header nav a[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left center;
 }
 
 .eyebrow {
@@ -514,8 +538,9 @@ a:focus-visible {
   align-self: center;
   font-size: clamp(4.25rem, 9vw, 9.8rem);
   font-weight: 450;
-  letter-spacing: -0.073em;
-  line-height: 0.86;
+  letter-spacing: -0.045em;
+  line-height: 0.82;
+  text-transform: uppercase;
 }
 
 .editorial-hero .hero-note {
@@ -540,6 +565,7 @@ a:focus-visible {
   min-width: 0;
   overflow: hidden;
   background: #111;
+  container-type: inline-size;
 }
 
 .work-project-link {
@@ -559,11 +585,55 @@ a:focus-visible {
   background: #111;
 }
 
+.project-video::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, #101010 30%, #181818 50%, #101010 70%);
+  background-size: 220% 100%;
+  content: "";
+  animation: video-waiting 1.8s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 420ms ease;
+}
+
 .project-video video {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-video.is-ready::before,
+.project-video.has-error::before {
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+.project-video.is-ready video {
+  opacity: 1;
+}
+
+.video-fallback {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  color: #9c9c98;
+  font-size: 0.72rem;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes video-waiting {
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+
+  50% {
+    background-position: 0 0;
+  }
 }
 
 .work-project-link > .project-video {
@@ -591,6 +661,13 @@ a:focus-visible {
 .work-project-link:hover > .project-video,
 .work-project-link:focus-visible > .project-video {
   transform: scale(1.025);
+}
+
+.work-project-link:hover .work-project-heading > span,
+.work-project-link:focus-visible .work-project-heading > span,
+.home-navigation a:hover .navigation-arrow,
+.home-navigation a:focus-visible .navigation-arrow {
+  transform: translate(0.16em, -0.16em);
 }
 
 .work-project-topline {
@@ -632,16 +709,19 @@ a:focus-visible {
 }
 
 .work-project-heading h2 {
-  min-width: max-content;
-  font-size: clamp(3.25rem, 6vw, 7rem);
+  min-width: 0;
+  font-size: clamp(2.75rem, 10.2cqw, 6.5rem);
   font-weight: 450;
-  letter-spacing: -0.055em;
-  line-height: 0.82;
+  letter-spacing: -0.045em;
+  line-height: 0.78;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .work-project-heading > span {
   padding-bottom: 0.18em;
   font-size: 1rem;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (hover: hover) and (min-width: 901px) {
@@ -683,6 +763,7 @@ a:focus-visible {
   padding-block: 0.8rem;
   border-bottom: 1px solid var(--ink);
   font-size: 1rem;
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .site-footer {
@@ -707,6 +788,7 @@ a:focus-visible {
 .site-footer a {
   color: var(--ink);
   text-align: right;
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .process-list {
@@ -715,39 +797,47 @@ a:focus-visible {
   padding-block: clamp(1rem, 2vw, 2rem) clamp(6rem, 9vw, 10rem);
 }
 
-.process-list details {
-  background: #ededE9;
+.process-list article {
+  background: #edede9;
+  transition:
+    background-color 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.process-list summary {
+.process-list button {
   display: grid;
   grid-template-columns: clamp(2.5rem, 5vw, 5rem) minmax(0, 1fr) 1rem;
   gap: 1rem;
   align-items: center;
+  width: 100%;
   min-height: clamp(6rem, 8vw, 8.5rem);
+  border: 0;
   padding: clamp(1.1rem, 1.8vw, 1.8rem);
+  background: transparent;
+  color: inherit;
   cursor: pointer;
-  list-style: none;
-  transition:
-    background-color 220ms ease,
-    color 220ms ease;
+  font: inherit;
+  text-align: left;
 }
 
-.process-list summary::-webkit-details-marker {
-  display: none;
+.process-list button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -0.45rem;
 }
 
-.process-list summary > span:first-child {
+.process-list button > span:first-child {
   color: var(--muted);
   font-size: 0.68rem;
   letter-spacing: 0.045em;
+  transition: color 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .process-title {
   font-size: clamp(2rem, 3.8vw, 4.2rem);
   font-weight: 450;
   letter-spacing: -0.04em;
-  line-height: 0.9;
+  line-height: 0.84;
+  text-transform: uppercase;
 }
 
 .process-indicator {
@@ -770,11 +860,25 @@ a:focus-visible {
   transform: rotate(90deg);
 }
 
-.process-list details[open] .process-indicator::after {
+.process-list article.is-open .process-indicator::after {
   transform: rotate(0deg);
 }
 
-.process-list details > p {
+.process-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 440ms;
+}
+
+.process-panel > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.process-panel p {
   max-width: 28rem;
   margin: 0 clamp(1.1rem, 1.8vw, 1.8rem) 0
     calc(clamp(1.1rem, 1.8vw, 1.8rem) + clamp(2.5rem, 5vw, 5rem) + 1rem);
@@ -782,17 +886,34 @@ a:focus-visible {
   color: #c8c8c2;
   font-size: clamp(0.9rem, 1.1vw, 1.08rem);
   line-height: 1.35;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition:
+    opacity 260ms ease,
+    transform 440ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.process-list details[open],
-.process-list details:hover {
+.process-list article.is-open,
+.process-list article:hover {
   background: var(--ink);
   color: var(--white);
 }
 
-.process-list details[open] summary > span:first-child,
-.process-list details:hover summary > span:first-child {
+.process-list article.is-open button > span:first-child,
+.process-list article:hover button > span:first-child {
   color: #aaa;
+}
+
+.process-list article.is-open .process-panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.process-list article.is-open .process-panel p {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 80ms;
 }
 
 .process-principle {
@@ -934,7 +1055,7 @@ a:focus-visible {
   padding-block: 0.9rem;
   border-bottom: 1px solid var(--ink);
   font-size: clamp(0.9rem, 1.2vw, 1.15rem);
-  transition: opacity 180ms ease;
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contact-actions .contact-primary {
@@ -970,7 +1091,7 @@ a:focus-visible {
 
 .contact-footer a,
 .next-project a {
-  transition: opacity 180ms ease;
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contact-footer > p {
@@ -996,8 +1117,9 @@ a:focus-visible {
   grid-column: 3 / 13;
   font-size: clamp(5rem, 10.5vw, 11.5rem);
   font-weight: 440;
-  letter-spacing: -0.08em;
-  line-height: 0.84;
+  letter-spacing: -0.045em;
+  line-height: 0.8;
+  text-transform: uppercase;
 }
 
 .case-heading > p:last-child {
@@ -1011,6 +1133,7 @@ a:focus-visible {
 
 .case-film {
   aspect-ratio: 16 / 9;
+  border-radius: 0.18rem;
 }
 
 .case-facts {
@@ -1187,9 +1310,12 @@ a:focus-visible {
   font-weight: 445;
   letter-spacing: -0.07em;
   line-height: 0.92;
+  text-transform: uppercase;
 }
 
-.next-project a:hover {
+.next-project a:hover,
+.closing-statement > a:hover,
+.site-footer a:hover {
   opacity: 0.64;
 }
 
@@ -1230,7 +1356,6 @@ a:focus-visible {
 
 .editorial-hero h1,
 .closing-statement h2,
-.process-list h2,
 .process-principle > p:last-child,
 .about-opening h1,
 .about-lead,
@@ -1417,7 +1542,7 @@ a:focus-visible {
 
   .work-project-heading h2 {
     min-width: 0;
-    font-size: clamp(3rem, 15vw, 5rem);
+    font-size: clamp(2.05rem, 9.2cqw, 4.5rem);
   }
 
   .closing-statement,
@@ -1454,7 +1579,7 @@ a:focus-visible {
     display: none;
   }
 
-  .process-list summary {
+  .process-list button {
     grid-template-columns: 2rem minmax(0, 1fr) 1rem;
     min-height: 6rem;
   }
@@ -1463,7 +1588,7 @@ a:focus-visible {
     font-size: clamp(2rem, 10vw, 3.2rem);
   }
 
-  .process-list details > p {
+  .process-panel p {
     margin-left: calc(1.1rem + 3rem);
   }
 
@@ -1521,7 +1646,7 @@ a:focus-visible {
 
   .case-heading h1 {
     margin-top: 4rem;
-    font-size: clamp(4.5rem, 18vw, 7.2rem);
+    font-size: clamp(3.75rem, 16.5vw, 7.2rem);
   }
 
   .case-facts {
@@ -1584,5 +1709,9 @@ a:focus-visible {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .project-video::before {
+    animation: none;
   }
 }

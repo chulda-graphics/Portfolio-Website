@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ProcessAccordion } from "@/components/process-accordion";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -70,18 +71,7 @@ export default function ProcessPage() {
         </p>
       </section>
 
-      <section className="process-list" aria-label="Working process">
-        {phases.map((phase, index) => (
-          <details key={phase.index} open={index === 0 ? true : undefined}>
-            <summary>
-              <span>{phase.index}</span>
-              <span className="process-title">{phase.title}</span>
-              <span className="process-indicator" aria-hidden="true" />
-            </summary>
-            <p>{phase.copy}</p>
-          </details>
-        ))}
-      </section>
+      <ProcessAccordion phases={phases} />
 
       <section className="process-principle">
         <p className="eyebrow">Working principle</p>

@@ -13,17 +13,13 @@ type MotionExperienceProps = {
 };
 
 const revealSelector = [
-  ".work-project",
   ".closing-statement",
-  ".process-list",
   ".process-principle",
   ".about-grid",
   ".about-manifesto",
   ".about-facts",
   ".contact-actions",
   ".contact-footer",
-  ".case-film",
-  ".case-facts",
   ".case-narrative",
   ".case-statement",
   ".case-process",
@@ -82,6 +78,9 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    const canUseInertialScroll = window.matchMedia(
+      "(min-width: 769px) and (pointer: fine)",
+    ).matches;
     const isFirstRender = !hasMounted.current;
     hasMounted.current = true;
     const isHome = pathname === "/";
@@ -89,14 +88,16 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     let smoother: ScrollSmoother | undefined;
     const context = gsap.context(() => {
       if (!reducedMotion && !isHome) {
-        smoother = ScrollSmoother.create({
-          wrapper: smoothWrapper,
-          content: smoothContent,
-          smooth: 1.05,
-          smoothTouch: 0.12,
-          effects: true,
-          normalizeScroll: false,
-        });
+        if (canUseInertialScroll) {
+          smoother = ScrollSmoother.create({
+            wrapper: smoothWrapper,
+            content: smoothContent,
+            smooth: 0.92,
+            smoothTouch: false,
+            effects: true,
+            normalizeScroll: false,
+          });
+        }
 
         gsap.fromTo(
           progress,
@@ -201,6 +202,20 @@ export function MotionExperience({ children }: MotionExperienceProps) {
       }
 
       if (!reducedMotion) {
+        if (!isFirstRender) {
+          gsap.fromTo(
+            route,
+            { autoAlpha: 0, y: 10 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.46,
+              ease: "power3.out",
+              clearProps: "transform,opacity,visibility",
+            },
+          );
+        }
+
         if (isHome) {
           gsap.fromTo(
             ".home-header > *, .home-navigation li, .home-footer > *",
@@ -256,6 +271,74 @@ export function MotionExperience({ children }: MotionExperienceProps) {
             },
           );
         });
+
+        gsap.utils
+          .toArray<HTMLElement>(".work-project, .case-film")
+          .forEach((element) => {
+            gsap.fromTo(
+              element,
+              { clipPath: "inset(0 0 100% 0)" },
+              {
+                clipPath: "inset(0 0 0% 0)",
+                duration: 1.02,
+                ease: "power4.inOut",
+                scrollTrigger: {
+                  trigger: element,
+                  start: "top 92%",
+                  once: true,
+                },
+              },
+            );
+          });
+
+        const staggerGroups = root.querySelectorAll<HTMLElement>(
+          ".case-facts, .process-list",
+        );
+
+        staggerGroups.forEach((group) => {
+          const children = group.querySelectorAll<HTMLElement>(
+            ":scope > div, :scope > article",
+          );
+
+          if (children.length === 0) return;
+
+          gsap.fromTo(
+            children,
+            { autoAlpha: 0, y: 14 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.58,
+              stagger: 0.055,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: group,
+                start: "top 88%",
+                once: true,
+              },
+            },
+          );
+        });
+
+        if (canUseInertialScroll) {
+          gsap.utils.toArray<HTMLElement>(".case-film video").forEach((video) => {
+            gsap.fromTo(
+              video,
+              { yPercent: -2.5, scale: 1.035 },
+              {
+                yPercent: 2.5,
+                scale: 1.035,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: video.closest(".case-film"),
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 0.55,
+                },
+              },
+            );
+          });
+        }
 
         const pageIntroTargets = root.querySelectorAll(
           ".site-header > :not(.site-rail), .site-rail > *, .editorial-hero .eyebrow, .editorial-hero .hero-note, .about-opening .eyebrow, .contact-main .eyebrow, .case-heading .eyebrow, .case-heading > p:last-child",
