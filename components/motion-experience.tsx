@@ -4,7 +4,6 @@ import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
@@ -25,6 +24,7 @@ const revealSelector = [
   ".case-process",
   ".case-quote",
   ".next-project",
+  ".work-project",
 ].join(",");
 
 const headingSelector = [
@@ -55,7 +55,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
   const hasMounted = useRef(false);
 
   useLayoutEffect(() => {
-    gsap.registerPlugin(ScrollSmoother, ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger, SplitText);
 
     const root = rootRef.current;
     const loader = loaderRef.current;
@@ -78,27 +78,24 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const canUseInertialScroll = window.matchMedia(
+    const canUseFineMotion = window.matchMedia(
       "(min-width: 769px) and (pointer: fine)",
     ).matches;
     const isFirstRender = !hasMounted.current;
     hasMounted.current = true;
     const isHome = pathname === "/";
     const splits: SplitText[] = [];
-    let smoother: ScrollSmoother | undefined;
+
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    smoothWrapper.scrollTop = 0;
+    gsap.set(smoothContent, { clearProps: "transform" });
+    ScrollTrigger.clearScrollMemory("manual");
+
     const context = gsap.context(() => {
       if (!reducedMotion && !isHome) {
-        if (canUseInertialScroll) {
-          smoother = ScrollSmoother.create({
-            wrapper: smoothWrapper,
-            content: smoothContent,
-            smooth: 0.92,
-            smoothTouch: false,
-            effects: true,
-            normalizeScroll: false,
-          });
-        }
-
         gsap.fromTo(
           progress,
           { scaleX: 0, autoAlpha: 0 },
@@ -135,47 +132,24 @@ export function MotionExperience({ children }: MotionExperienceProps) {
 
         intro
           .set(loader, { display: "block", clipPath: "inset(0 0 0 0)" })
-          .set(".loader-identity", { autoAlpha: 0 })
-          .fromTo(
-            ".loader-mark",
-            { autoAlpha: 0, scale: 0.965 },
-            { autoAlpha: 1, scale: 1, duration: 0.42 },
-          )
-          .fromTo(
-            ".loader-glow",
-            { xPercent: -42, scale: 0.86 },
-            { xPercent: 42, scale: 1.08, duration: 1.3, ease: "sine.inOut" },
-            0,
-          )
-          .to(
-            ".loader-mark",
-            { autoAlpha: 0, y: -8, duration: 0.28, ease: "power2.in" },
-            0.5,
-          )
-          .set(".loader-identity", { autoAlpha: 1 }, 0.64)
+          .set(".loader-identity", { autoAlpha: 1 })
           .fromTo(
             ".loader-name span",
-            { yPercent: 112 },
-            { yPercent: 0, duration: 0.68, ease: "power4.out" },
-            0.64,
+            { yPercent: 108 },
+            { yPercent: 0, duration: 0.64, ease: "power4.out" },
+            0.08,
           )
           .fromTo(
-            ".loader-discipline span",
-            { autoAlpha: 0, yPercent: 45 },
-            { autoAlpha: 1, yPercent: 0, duration: 0.48 },
-            0.82,
-          )
-          .fromTo(
-            ".loader-meta > *:not(.loader-count)",
+            ".loader-meta > *",
             { autoAlpha: 0, y: 8 },
-            { autoAlpha: 1, y: 0, duration: 0.34, stagger: 0.05 },
-            0.88,
+            { autoAlpha: 1, y: 0, duration: 0.34, stagger: 0.045 },
+            0.28,
           )
           .to(
             count,
             {
               value: 100,
-              duration: 0.86,
+              duration: 0.88,
               ease: "power2.out",
               onUpdate: () => {
                 loaderCount.textContent = String(Math.round(count.value)).padStart(
@@ -184,16 +158,16 @@ export function MotionExperience({ children }: MotionExperienceProps) {
                 );
               },
             },
-            0.68,
+            0.18,
           )
           .to(
             loader,
             {
               clipPath: "inset(0 0 100% 0)",
-              duration: 0.76,
+              duration: 0.72,
               ease: "power4.inOut",
             },
-            1.5,
+            1.14,
           )
           .set(loader, { display: "none" });
       } else {
@@ -205,13 +179,12 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         if (!isFirstRender) {
           gsap.fromTo(
             route,
-            { autoAlpha: 0, y: 10 },
+            { autoAlpha: 0 },
             {
               autoAlpha: 1,
-              y: 0,
-              duration: 0.46,
-              ease: "power3.out",
-              clearProps: "transform,opacity,visibility",
+              duration: 0.3,
+              ease: "power2.out",
+              clearProps: "opacity,visibility",
             },
           );
         }
@@ -226,7 +199,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.62,
               stagger: 0.055,
               ease: "power3.out",
-              delay: isFirstRender ? 1.72 : 0.04,
+              delay: isFirstRender ? 1.28 : 0.02,
             },
           );
         }
@@ -237,7 +210,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
           const split = new SplitText(heading, {
             type: "lines",
             linesClass: "motion-line",
-            mask: "lines",
           });
           splits.push(split);
 
@@ -249,7 +221,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.75,
               stagger: 0.06,
               ease: "power4.out",
-              delay: isFirstRender ? 1.72 : 0.04,
+              delay: isFirstRender ? 1.28 : 0.02,
             },
           );
         });
@@ -273,7 +245,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         });
 
         gsap.utils
-          .toArray<HTMLElement>(".work-project, .case-film")
+          .toArray<HTMLElement>(".case-film")
           .forEach((element) => {
             gsap.fromTo(
               element,
@@ -320,7 +292,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
           );
         });
 
-        if (canUseInertialScroll) {
+        if (canUseFineMotion) {
           gsap.utils.toArray<HTMLElement>(".case-film video").forEach((video) => {
             gsap.fromTo(
               video,
@@ -354,7 +326,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.5,
               stagger: 0.045,
               ease: "power3.out",
-              delay: isFirstRender ? 1.78 : 0.03,
+              delay: isFirstRender ? 1.34 : 0.02,
             },
           );
         }
@@ -365,7 +337,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     return () => {
       document.body.classList.remove("is-intro-playing");
       route.inert = false;
-      smoother?.kill();
       context.revert();
       splits.reverse().forEach((split) => split.revert());
     };
@@ -377,21 +348,19 @@ export function MotionExperience({ children }: MotionExperienceProps) {
       ref={rootRef}
     >
       <div className="site-loader" ref={loaderRef} aria-hidden="true">
-        <div className="loader-glow" />
-        <p className="loader-mark">Dhrex</p>
         <div className="loader-identity">
-          <p className="loader-name">
-            <span>dhrex</span>
-          </p>
-          <p className="loader-discipline">
-            <span>SaaS motion designer</span>
-          </p>
-          <div className="loader-meta">
+          <div className="loader-meta loader-meta-top">
             <p>Portfolio / 2026</p>
             <p className="loader-count">
               <span ref={loaderCountRef}>000</span>
               <span aria-hidden="true">%</span>
             </p>
+          </div>
+          <p className="loader-name">
+            <span>DHREX</span>
+          </p>
+          <div className="loader-meta loader-meta-bottom">
+            <p>SaaS Motion Designer</p>
             <p>Remote worldwide</p>
           </div>
         </div>

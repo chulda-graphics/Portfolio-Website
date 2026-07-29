@@ -77,30 +77,7 @@ body.is-intro-playing {
   overflow: hidden;
   background: #0a0a0a;
   color: #fff;
-  animation: loader-fallback 0s linear 3.5s forwards;
-}
-
-.loader-glow {
-  position: absolute;
-  inset: -20%;
-  background: radial-gradient(
-    circle at center,
-    rgb(255 255 255 / 0.15) 0,
-    rgb(255 255 255 / 0.055) 22%,
-    transparent 58%
-  );
-  filter: blur(16px);
-  pointer-events: none;
-}
-
-.loader-mark {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  z-index: 1;
-  font-size: clamp(1.65rem, 3vw, 2.75rem);
-  font-weight: 620;
-  letter-spacing: -0.055em;
-  transform: translate(-50%, -50%);
+  animation: loader-fallback 0s linear 2.6s forwards;
 }
 
 .loader-identity {
@@ -109,8 +86,6 @@ body.is-intro-playing {
   z-index: 2;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  visibility: hidden;
-  opacity: 0;
   padding:
     max(clamp(1.25rem, 2.6vw, 2.75rem), env(safe-area-inset-top))
     max(clamp(1.25rem, 3.25vw, 3.75rem), env(safe-area-inset-right))
@@ -119,36 +94,23 @@ body.is-intro-playing {
 }
 
 .loader-name {
+  align-self: center;
   overflow: hidden;
-  margin-top: -0.08em;
-  font-size: clamp(5.5rem, 15.8vw, 18rem);
+  font-size: clamp(5.25rem, min(17vw, 25svh), 18rem);
   font-weight: 430;
-  letter-spacing: -0.06em;
-  line-height: 0.76;
-  text-transform: lowercase;
+  letter-spacing: -0.045em;
+  line-height: 0.78;
+  text-align: center;
+  text-transform: uppercase;
 }
 
-.loader-name span,
-.loader-discipline span {
+.loader-name span {
   display: block;
 }
 
-.loader-discipline {
-  align-self: center;
-  justify-self: center;
-  overflow: hidden;
-  color: #92928f;
-  font-size: clamp(3rem, 8vw, 9rem);
-  font-weight: 400;
-  letter-spacing: -0.055em;
-  line-height: 0.9;
-  text-align: center;
-  text-transform: lowercase;
-}
-
 .loader-meta {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: end;
   gap: 1rem;
   color: #a0a09c;
@@ -159,8 +121,8 @@ body.is-intro-playing {
   text-transform: uppercase;
 }
 
-.loader-meta > p:last-child {
-  text-align: right;
+.loader-meta-top {
+  align-items: start;
 }
 
 .loader-count {
@@ -196,6 +158,9 @@ body.is-intro-playing {
 
 .motion-line {
   display: block;
+  overflow: visible;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
 }
 
 @keyframes loader-fallback {
@@ -300,6 +265,7 @@ a:focus-visible {
   min-width: 0;
   overflow: hidden;
   background: #f1f1ee;
+  container-type: inline-size;
 }
 
 .home-navigation a {
@@ -367,7 +333,7 @@ a:focus-visible {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: clamp(2.35rem, min(4.2vw, 9svh), 5.3rem);
+  font-size: clamp(2.35rem, min(17cqw, 9svh), 5.3rem);
   font-weight: 455;
   letter-spacing: -0.04em;
   line-height: 0.84;
@@ -558,7 +524,7 @@ a:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(0.55rem, 1vw, 1rem);
   padding-block: clamp(1rem, 2vw, 2rem) clamp(7rem, 10vw, 11rem);
-  transition: grid-template-columns 520ms cubic-bezier(0.2, 0.72, 0.2, 1);
+  transition: grid-template-columns 650ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .work-project {
@@ -660,7 +626,7 @@ a:focus-visible {
 
 .work-project-link:hover > .project-video,
 .work-project-link:focus-visible > .project-video {
-  transform: scale(1.025);
+  transform: scale(1.012);
 }
 
 .work-project-link:hover .work-project-heading > span,
@@ -727,12 +693,12 @@ a:focus-visible {
 @media (hover: hover) and (min-width: 901px) {
   .work-showcase:has(.work-project:first-child:hover),
   .work-showcase:has(.work-project:first-child:focus-within) {
-    grid-template-columns: 1.32fr 0.68fr;
+    grid-template-columns: 1.12fr 0.88fr;
   }
 
   .work-showcase:has(.work-project:last-child:hover),
   .work-showcase:has(.work-project:last-child:focus-within) {
-    grid-template-columns: 0.68fr 1.32fr;
+    grid-template-columns: 0.88fr 1.12fr;
   }
 }
 
@@ -750,11 +716,12 @@ a:focus-visible {
 
 .closing-statement h2 {
   grid-column: 4 / 13;
-  max-width: 12ch;
+  max-width: 13ch;
   font-size: clamp(3rem, 6.8vw, 7.5rem);
   font-weight: 450;
   letter-spacing: -0.07em;
   line-height: 0.9;
+  text-transform: uppercase;
 }
 
 .closing-statement > a {
@@ -930,10 +897,11 @@ a:focus-visible {
 .process-principle > p:last-child {
   grid-column: 5 / 13;
   max-width: 14ch;
-  font-size: clamp(3rem, 6.2vw, 6.8rem);
+  font-size: clamp(3rem, min(6.2vw, 9svh), 6.8rem);
   font-weight: 440;
   letter-spacing: -0.068em;
   line-height: 0.92;
+  text-transform: uppercase;
 }
 
 .about-opening {
@@ -945,10 +913,11 @@ a:focus-visible {
   max-width: 14ch;
   margin-top: clamp(2rem, 4vw, 4rem);
   margin-left: auto;
-  font-size: clamp(3.7rem, 7.4vw, 8.5rem);
+  font-size: clamp(3.4rem, min(6.2vw, 9.5svh), 7.2rem);
   font-weight: 445;
   letter-spacing: -0.072em;
-  line-height: 0.9;
+  line-height: 0.86;
+  text-transform: uppercase;
 }
 
 .about-grid {
@@ -966,6 +935,7 @@ a:focus-visible {
   font-weight: 450;
   letter-spacing: -0.06em;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .about-copy {
@@ -993,10 +963,11 @@ a:focus-visible {
 .about-manifesto > p:last-child {
   grid-column: 4 / 13;
   max-width: 13ch;
-  font-size: clamp(3.4rem, 7vw, 7.8rem);
+  font-size: clamp(3.2rem, min(5.4vw, 8.4svh), 6.2rem);
   font-weight: 445;
   letter-spacing: -0.07em;
-  line-height: 0.91;
+  line-height: 0.88;
+  text-transform: uppercase;
 }
 
 .about-facts {
@@ -1038,10 +1009,11 @@ a:focus-visible {
 .contact-main h1 {
   max-width: 15ch;
   margin-top: 2rem;
-  font-size: clamp(4rem, 8vw, 9rem);
+  font-size: clamp(3.6rem, min(6.5vw, 10svh), 7.5rem);
   font-weight: 445;
   letter-spacing: -0.075em;
-  line-height: 0.88;
+  line-height: 0.85;
+  text-transform: uppercase;
 }
 
 .contact-actions {
@@ -1176,11 +1148,12 @@ a:focus-visible {
 
 .case-narrative h2 {
   grid-column: 3 / 9;
-  max-width: 13ch;
-  font-size: clamp(2.8rem, 5.3vw, 6rem);
+  max-width: 14.75ch;
+  font-size: clamp(2.8rem, 4.35vw, 5.1rem);
   font-weight: 445;
   letter-spacing: -0.068em;
   line-height: 0.92;
+  text-transform: uppercase;
 }
 
 .case-body {
@@ -1222,6 +1195,7 @@ a:focus-visible {
   font-weight: 440;
   letter-spacing: -0.07em;
   line-height: 0.92;
+  text-transform: uppercase;
 }
 
 .case-process {
@@ -1236,6 +1210,7 @@ a:focus-visible {
   font-weight: 445;
   letter-spacing: -0.07em;
   line-height: 0.91;
+  text-transform: uppercase;
 }
 
 .case-process li {
@@ -1597,7 +1572,7 @@ a:focus-visible {
   }
 
   .about-opening h1 {
-    font-size: clamp(3.4rem, 15vw, 5.5rem);
+    font-size: clamp(3rem, 13.7vw, 5.2rem);
   }
 
   .about-lead,
@@ -1656,7 +1631,7 @@ a:focus-visible {
 
   .case-narrative h2 {
     margin-top: 3rem;
-    font-size: clamp(3rem, 14vw, 5rem);
+    font-size: clamp(2.8rem, 12vw, 4.6rem);
   }
 
   .case-body {
