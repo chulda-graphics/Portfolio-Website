@@ -4,9 +4,13 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { CustomEase } from "gsap/CustomEase";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(CustomEase, ScrollToPlugin, ScrollTrigger, SplitText, useGSAP);
+CustomEase.create("chuldaEase", "M0,0 C0.16,1 0.3,1 1,1");
 
 const projects = [
   {
@@ -62,65 +66,213 @@ export function PortfolioPage() {
   const [testimonial, setTestimonial] = useState(0);
 
   useGSAP(
-    () => {
-      gsap.from(".hero-word", {
-        yPercent: 110,
-        duration: 1.2,
-        stagger: 0.08,
-        ease: "power4.out",
-        delay: 0.15,
-      });
+    (_context, contextSafe) => {
+      const root = page.current;
+      if (!root) return;
 
-      gsap.from(".hero-support", {
-        opacity: 0,
-        y: 24,
-        duration: 0.8,
-        delay: 0.85,
-        ease: "power3.out",
-      });
+      const select = gsap.utils.selector(root);
+      const media = gsap.utils.toArray<HTMLElement>(".project-media", root);
+      const mm = gsap.matchMedia();
+      const pointerToX = gsap.utils.pipe(
+        gsap.utils.clamp(0, 1),
+        gsap.utils.mapRange(0, 1, -18, 18),
+      );
+      const pointerToY = gsap.utils.pipe(
+        gsap.utils.clamp(0, 1),
+        gsap.utils.mapRange(0, 1, -10, 10),
+      );
 
-      const media = gsap.utils.toArray<HTMLElement>(".project-media");
-      media.forEach((element) => {
-        gsap.fromTo(
-          element,
-          { scale: 0.82, opacity: 0.35, filter: "brightness(0.45)" },
-          {
-            scale: 1,
-            opacity: 1,
-            filter: "brightness(1)",
-            ease: "none",
-            scrollTrigger: {
-              trigger: element,
-              start: "top 88%",
-              end: "center 48%",
-              scrub: 1,
+      mm.add(
+        {
+          desktop: "(min-width: 900px)",
+          mobile: "(max-width: 899px)",
+          reduceMotion: "(prefers-reduced-motion: reduce)",
+        },
+        (mediaContext) => {
+          const { desktop, reduceMotion } = mediaContext.conditions as {
+            desktop: boolean;
+            mobile: boolean;
+            reduceMotion: boolean;
+          };
+
+          if (reduceMotion) {
+            gsap.set(select(".hero-word, .hero-support, .bento-card, .project-media"), {
+              clearProps: "all",
+              autoAlpha: 1,
+            });
+            return;
+          }
+
+          const intro = gsap.timeline({ defaults: { ease: "chuldaEase" } });
+          intro
+            .addLabel("words")
+            .from(select(".hero-word"), {
+              yPercent: 110,
+              duration: 1.15,
+              stagger: 0.09,
+              force3D: true,
+            }, "words")
+            .addLabel("support", "words+=0.58")
+            .from(select(".hero-support"), {
+              autoAlpha: 0,
+              y: 24,
+              duration: 0.78,
+              stagger: 0.08,
+              force3D: true,
+            }, "support");
+
+          const statement = SplitText.create(select(".statement-reveal"), {
+            type: "words",
+            aria: "auto",
+          });
+          gsap.fromTo(
+            statement.words,
+            { autoAlpha: 0.12, yPercent: 18 },
+            {
+              autoAlpha: 1,
+              yPercent: 0,
+              stagger: 0.035,
+              ease: "none",
+              scrollTrigger: {
+                id: "statement-words",
+                trigger: ".statement-reveal",
+                start: "clamp(top 82%)",
+                end: "clamp(bottom 45%)",
+                scrub: 0.7,
+                refreshPriority: 1,
+              },
             },
-          },
-        );
-      });
+          );
 
-      if (window.matchMedia("(min-width: 900px)").matches && work.current) {
-        ScrollTrigger.create({
-          trigger: work.current,
-          start: "top 10%",
-          end: "bottom 82%",
-          pin: ".work-intro",
-          pinSpacing: false,
+          gsap.set(select(".bento-card"), { autoAlpha: 0, y: 44 });
+          ScrollTrigger.batch(select(".bento-card"), {
+            start: "top 88%",
+            once: true,
+            interval: 0.08,
+            batchMax: desktop ? 4 : 2,
+            onEnter: (cards) => gsap.to(cards, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.85,
+              stagger: 0.09,
+              ease: "chuldaEase",
+              overwrite: "auto",
+              clearProps: "transform,visibility",
+            }),
+          });
+
+          media.forEach((element, index) => {
+            gsap.fromTo(
+              element,
+              { scale: 0.84, autoAlpha: 0.35, filter: "brightness(0.5)" },
+              {
+                scale: 1,
+                autoAlpha: 1,
+                filter: "brightness(1)",
+                ease: "none",
+                scrollTrigger: {
+                  id: `project-media-${index}`,
+                  trigger: element,
+                  start: "clamp(top 90%)",
+                  end: "clamp(center 48%)",
+                  scrub: 0.8,
+                  refreshPriority: 2 + index,
+                },
+              },
+            );
+          });
+
+          if (desktop && work.current) {
+            ScrollTrigger.create({
+              id: "work-intro-pin",
+              trigger: work.current,
+              start: "top 10%",
+              end: "bottom 82%",
+              pin: ".work-intro",
+              pinSpacing: false,
+              refreshPriority: 2,
+            });
+          }
+
+          const marquee = gsap.to(select(".marquee-track"), {
+            xPercent: -50,
+            duration: 22,
+            ease: "none",
+            repeat: -1,
+            paused: true,
+            force3D: true,
+          });
+          ScrollTrigger.create({
+            id: "marquee-visibility",
+            trigger: ".marquee",
+            start: "top bottom",
+            end: "bottom top",
+            onEnter: () => marquee.play(),
+            onEnterBack: () => marquee.play(),
+            onLeave: () => marquee.pause(),
+            onLeaveBack: () => marquee.pause(),
+          });
+
+          return () => statement.revert();
+        },
+        root,
+      );
+
+      const stage = select(".hero-stage")[0] as HTMLElement | undefined;
+      const orbit = select(".stage-orbit");
+      if (stage && orbit.length) {
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const xTo = gsap.quickTo(orbit, "x", { duration: 0.65, ease: "power3.out" });
+        const yTo = gsap.quickTo(orbit, "y", { duration: 0.65, ease: "power3.out" });
+        const onPointerMove = contextSafe!((event: PointerEvent) => {
+          const bounds = stage.getBoundingClientRect();
+          xTo(pointerToX((event.clientX - bounds.left) / bounds.width));
+          yTo(pointerToY((event.clientY - bounds.top) / bounds.height));
         });
+        const onPointerLeave = contextSafe!(() => {
+          xTo(0);
+          yTo(0);
+        });
+        if (!prefersReducedMotion) {
+          stage.addEventListener("pointermove", onPointerMove);
+          stage.addEventListener("pointerleave", onPointerLeave);
+        }
+
+        const anchorLinks = gsap.utils.toArray<HTMLAnchorElement>('a[href^="#"]', root);
+        const onAnchorClick = contextSafe!((event: MouseEvent) => {
+          const link = event.currentTarget as HTMLAnchorElement;
+          const target = root.querySelector(link.hash);
+          if (!target) return;
+          event.preventDefault();
+          gsap.to(window, {
+            scrollTo: { y: target, offsetY: 16 },
+            duration: prefersReducedMotion ? 0 : 1.05,
+            ease: "chuldaEase",
+            overwrite: "auto",
+          });
+        });
+        anchorLinks.forEach((link) => link.addEventListener("click", onAnchorClick));
+
+        document.fonts.ready.then(contextSafe!(() => ScrollTrigger.refresh()));
+
+        return () => {
+          if (!prefersReducedMotion) {
+            stage.removeEventListener("pointermove", onPointerMove);
+            stage.removeEventListener("pointerleave", onPointerLeave);
+          }
+          anchorLinks.forEach((link) => link.removeEventListener("click", onAnchorClick));
+          mm.revert();
+        };
       }
 
-      gsap.to(".marquee-track", {
-        xPercent: -50,
-        duration: 22,
-        ease: "none",
-        repeat: -1,
-      });
+      return () => mm.revert();
     },
     { scope: page },
   );
 
   const changeTestimonial = (direction: number) => {
-    setTestimonial((current) => (current + direction + testimonials.length) % testimonials.length);
+    const wrap = gsap.utils.wrap(0, testimonials.length);
+    setTestimonial((current) => wrap(current + direction));
   };
 
   return (
@@ -167,7 +319,7 @@ export function PortfolioPage() {
 
       <section className="statement" id="approach">
         <p className="eyebrow">The work behind the work</p>
-        <h2>
+        <h2 className="statement-reveal">
           The animation is never the point. The moment of <em>understanding</em> is.
         </h2>
         <p className="statement-copy">

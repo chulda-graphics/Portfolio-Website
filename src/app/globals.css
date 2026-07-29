@@ -59,6 +59,7 @@ button, input { font: inherit; }
 .button-primary:hover { background: var(--lime); }
 .button-secondary { color: var(--paper); border: 1px solid #525257; background: rgba(11,12,15,.5); }
 .hero-stage { width: min(1180px, 94vw); height: 235px; position: relative; overflow: hidden; margin-top: 50px; border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.025); box-shadow: 0 45px 100px rgba(0,0,0,.4); }
+.stage-orbit, .project-media, .marquee-track { will-change: transform, opacity; }
 .stage-grid { position: absolute; inset: 0; opacity: .25; background-image: linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(circle, black, transparent 74%); }
 .stage-orbit { position: absolute; left: 50%; top: 57%; border: 1px solid rgba(200,255,77,.24); border-radius: 50%; transform: translate(-50%,-50%) rotate(-8deg); }
 .orbit-one { width: 590px; height: 180px; }
