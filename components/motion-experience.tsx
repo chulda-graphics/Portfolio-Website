@@ -11,6 +11,9 @@ type MotionExperienceProps = {
   children: React.ReactNode;
 };
 
+let introShownForCurrentLoad = false;
+let pendingRouteTransition = false;
+
 const revealSelector = [
   ".closing-statement",
   ".process-principle",
@@ -54,10 +57,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
   const smoothContentRef = useRef<HTMLDivElement>(null);
   const routeRef = useRef<HTMLDivElement>(null);
   const routeTransitionRef = useRef<HTMLDivElement>(null);
-  const routeSheetRef = useRef<HTMLDivElement>(null);
   const transitionLabelRef = useRef<HTMLSpanElement>(null);
-  const routeTransitioning = useRef(false);
-  const hasMounted = useRef(false);
 
   useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -70,7 +70,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     const smoothContent = smoothContentRef.current;
     const route = routeRef.current;
     const routeTransition = routeTransitionRef.current;
-    const routeSheet = routeSheetRef.current;
     const transitionLabel = transitionLabelRef.current;
 
     if (
@@ -82,7 +81,6 @@ export function MotionExperience({ children }: MotionExperienceProps) {
       !smoothContent ||
       !route ||
       !routeTransition ||
-      !routeSheet ||
       !transitionLabel
     ) return;
 
@@ -92,10 +90,10 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     const canUseFineMotion = window.matchMedia(
       "(min-width: 769px) and (pointer: fine)",
     ).matches;
-    const isFirstRender = !hasMounted.current;
-    hasMounted.current = true;
+    const isFirstRender = !introShownForCurrentLoad;
+    introShownForCurrentLoad = true;
     const isHome = pathname === "/";
-    const isTransitionArrival = routeTransitioning.current && !isFirstRender;
+    const isTransitionArrival = pendingRouteTransition && !isFirstRender;
     const splits: SplitText[] = [];
     let arrivalTimeline: gsap.core.Timeline | undefined;
 
@@ -109,30 +107,25 @@ export function MotionExperience({ children }: MotionExperienceProps) {
 
     if (isTransitionArrival && !reducedMotion) {
       route.inert = true;
-      gsap.set(route, { autoAlpha: 1, y: 28 });
+      gsap.set(route, { autoAlpha: 1 });
+      gsap.set(routeTransition, { display: "block", yPercent: 0 });
       arrivalTimeline = gsap
         .timeline({
           onComplete: () => {
-            gsap.set(routeTransition, { display: "none" });
+            gsap.set(routeTransition, { display: "none", yPercent: 100 });
             document.body.classList.remove("is-route-transitioning");
-            routeTransitioning.current = false;
+            pendingRouteTransition = false;
             route.inert = false;
           },
         })
         .to(
-          routeSheet,
+          routeTransition,
           {
-            yPercent: -108,
-            rotation: -1.1,
-            duration: 0.78,
+            yPercent: -100,
+            duration: 0.64,
             ease: "power4.inOut",
           },
-          0.08,
-        )
-        .to(
-          route,
-          { y: 0, duration: 0.82, ease: "power4.out", clearProps: "transform" },
-          0.14,
+          0.06,
         );
     }
 
@@ -173,32 +166,30 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         });
 
         intro
-          .set(loader, { display: "block", clipPath: "inset(0 0 0 0)" })
+          .set(loader, { display: "block", yPercent: 0 })
           .set(".loader-identity", { autoAlpha: 1 })
-          .set(".loader-window", {
-            width: "100vw",
-            height: "100vh",
-            borderRadius: 0,
-          })
-          .set(".loader-word-left", { xPercent: -145 })
-          .set(".loader-word-right", { xPercent: 145 })
           .fromTo(
             ".loader-meta > *",
             { autoAlpha: 0, y: 8 },
             { autoAlpha: 1, y: 0, duration: 0.32, stagger: 0.04 },
-            0.12,
+            0.08,
           )
           .fromTo(
-            ".loader-window-copy > *",
-            { autoAlpha: 0, y: 10 },
-            { autoAlpha: 1, y: 0, duration: 0.36, stagger: 0.06 },
-            0.18,
+            ".loader-wordmark",
+            { clipPath: "inset(0 100% 0 0)", y: 12 },
+            {
+              clipPath: "inset(0 0% 0 0)",
+              y: 0,
+              duration: 0.72,
+              ease: "power4.inOut",
+            },
+            0.12,
           )
           .to(
             count,
             {
               value: 100,
-              duration: 0.9,
+              duration: 0.82,
               ease: "power2.out",
               onUpdate: () => {
                 loaderCount.textContent = String(Math.round(count.value)).padStart(
@@ -207,37 +198,16 @@ export function MotionExperience({ children }: MotionExperienceProps) {
                 );
               },
             },
-            0.12,
-          )
-          .to(
-            ".loader-window-copy",
-            { autoAlpha: 0, duration: 0.24, ease: "power2.in" },
-            0.68,
-          )
-          .to(
-            ".loader-window",
-            {
-              width: "clamp(6.5rem, 17vw, 16rem)",
-              height: "clamp(4rem, 10vw, 9rem)",
-              borderRadius: "0.15rem",
-              duration: 0.98,
-              ease: "power4.inOut",
-            },
-            0.7,
-          )
-          .to(
-            ".loader-word-left, .loader-word-right",
-            { xPercent: 0, duration: 0.92, ease: "power4.inOut" },
-            0.78,
+            0.1,
           )
           .to(
             loader,
             {
-              clipPath: "inset(0 0 100% 0)",
-              duration: 0.74,
+              yPercent: -100,
+              duration: 0.68,
               ease: "power4.inOut",
             },
-            1.76,
+            1.05,
           )
           .set(loader, { display: "none" });
       } else {
@@ -269,7 +239,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.62,
               stagger: 0.055,
               ease: "power3.out",
-              delay: isFirstRender ? 2.02 : isTransitionArrival ? 0.22 : 0.02,
+              delay: isFirstRender ? 1.42 : isTransitionArrival ? 0.12 : 0.02,
             },
           );
         }
@@ -291,7 +261,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.75,
               stagger: 0.06,
               ease: "power4.out",
-              delay: isFirstRender ? 2.02 : isTransitionArrival ? 0.22 : 0.02,
+              delay: isFirstRender ? 1.42 : isTransitionArrival ? 0.12 : 0.02,
             },
           );
         });
@@ -396,7 +366,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               duration: 0.5,
               stagger: 0.045,
               ease: "power3.out",
-              delay: isFirstRender ? 2.08 : isTransitionArrival ? 0.24 : 0.02,
+              delay: isFirstRender ? 1.46 : isTransitionArrival ? 0.14 : 0.02,
             },
           );
         }
@@ -413,7 +383,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         event.ctrlKey ||
         event.shiftKey ||
         event.altKey ||
-        routeTransitioning.current
+        pendingRouteTransition
       ) {
         return;
       }
@@ -436,34 +406,28 @@ export function MotionExperience({ children }: MotionExperienceProps) {
       }
 
       event.preventDefault();
-      routeTransitioning.current = true;
+      pendingRouteTransition = true;
       route.inert = true;
-      transitionLabel.textContent =
+      const explicitLabel = anchor.querySelector<HTMLElement>(
+        ".navigation-preview span:last-child, .work-project-heading h2",
+      )?.textContent;
+      transitionLabel.textContent = explicitLabel?.trim() ||
         anchor.textContent?.replace("↗", "").trim().split(/\s+/).slice(-2).join(" ") ||
         "Next page";
       document.body.classList.add("is-route-transitioning");
 
-      gsap.killTweensOf([routeTransition, routeSheet, route]);
+      gsap.killTweensOf(routeTransition);
       gsap.set(routeTransition, { display: "block" });
       gsap.fromTo(
-        routeSheet,
-        { yPercent: 108, rotation: 1.15, scale: 0.985 },
+        routeTransition,
+        { yPercent: 100 },
         {
           yPercent: 0,
-          rotation: 0,
-          scale: 1,
-          duration: 0.72,
+          duration: 0.62,
           ease: "power4.inOut",
           onComplete: () => router.push(`${destination.pathname}${destination.search}`),
         },
       );
-      gsap.to(route, {
-        y: -22,
-        rotation: -0.2,
-        scale: 0.987,
-        duration: 0.72,
-        ease: "power4.inOut",
-      });
     };
 
     root.addEventListener("click", handleRouteClick);
@@ -471,7 +435,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
     return () => {
       root.removeEventListener("click", handleRouteClick);
       arrivalTimeline?.kill();
-      if (!routeTransitioning.current) {
+      if (!pendingRouteTransition) {
         document.body.classList.remove(
           "is-intro-playing",
           "is-route-transitioning",
@@ -497,16 +461,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
               <span aria-hidden="true">%</span>
             </p>
           </div>
-          <div className="loader-stage">
-            <span className="loader-word loader-word-left">DH</span>
-            <div className="loader-window">
-              <div className="loader-window-copy">
-                <span>Purpose-led motion</span>
-                <span>Clarity in every frame</span>
-              </div>
-            </div>
-            <span className="loader-word loader-word-right">REX</span>
-          </div>
+          <p className="loader-wordmark">DHREX</p>
           <div className="loader-meta loader-meta-bottom">
             <p>SaaS Motion Designer</p>
             <p>Remote worldwide</p>
@@ -519,7 +474,7 @@ export function MotionExperience({ children }: MotionExperienceProps) {
         ref={routeTransitionRef}
         aria-hidden="true"
       >
-        <div className="route-transition-sheet" ref={routeSheetRef}>
+        <div className="route-transition-sheet">
           <span>DHREX</span>
           <span ref={transitionLabelRef}>Next page</span>
         </div>

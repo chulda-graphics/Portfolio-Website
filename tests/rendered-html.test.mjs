@@ -40,7 +40,7 @@ test("non-scrolling homepage server-renders the portfolio index and intro shell"
     assert.match(html, new RegExp(`>${label}<`, "i"));
   }
   assert.match(html, /class=["']site-loader["']/i);
-  assert.match(html, /class=["']loader-window["']/i);
+  assert.match(html, /class=["']loader-wordmark["']/i);
   assert.match(html, /class=["']route-transition["']/i);
   assert.equal((html.match(/class=["']navigation-preview["']/gi) ?? []).length, 4);
   assert.doesNotMatch(html, /MacBook|loading-screen|carousel|custom-cursor/i);
