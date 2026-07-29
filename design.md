@@ -1,16 +1,16 @@
 ---
-version: "neuform-top-creators-featured"
-name: "Dynamic Interfaces | Canvas Engine"
-description: "Canvas Engine Pricing Section is designed for comparing plans and supporting conversion decisions. Key features include plan comparison blocks and conversion-oriented actions. Built with custom CSS, it is suitable for subscription pricing pages and plan comparison experiences."
+version: "neuform-staff-featured-2026-05-22"
+name: "Partner Testimonials"
+description: "Partner Testimonials Testimonial Section is designed for showcasing social proof and customer credibility. Key features include reusable structure, responsive behavior, and production-ready presentation. It is suitable for component libraries and responsive product interfaces."
 colors:
-  primary: "#60A5FA"
-  secondary: "#09090B"
-  accent: "#60A5FA"
-  background: "#09090B"
-  surface: "#18181B"
+  primary: "#030303"
+  secondary: "#111111"
+  accent: "#030303"
+  background: "#030303"
+  surface: "#1A1A1A"
   text-primary: "#FFFFFF"
   text-secondary: "#A1A1AA"
-  border: "#27272A"
+  border: "#A0A0A0"
 typography:
   display-lg:
     fontFamily: "Inter"
@@ -19,7 +19,7 @@ typography:
     lineHeight: "1.04"
     letterSpacing: "0"
   body-md:
-    fontFamily: "Inter"
+    fontFamily: "Playfair Display"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: "1.6"
@@ -34,7 +34,7 @@ spacing:
   card-padding: "24px"
   section-padding: "80px"
 rounded:
-  card: "8px"
+  card: "16px"
   control: "8px"
   pill: "9999px"
 components:
@@ -45,20 +45,20 @@ components:
     background: "Use primary or accent colors for the main action"
     radius: "Use the control or pill radius based on the source HTML"
 ---
-# Dynamic Interfaces | Canvas Engine
-Source: Neuform Featured templates from top creators. Author: Sourany Phomhome (@sou). Views: 6; favorites: 3; remixes: 0.
-Tags: pricing, section, css, responsive, animated, interactive, plans, billing.
+# Partner Testimonials
+Source: Neuform staff featured templates. Author: Sakura DesignCode (@sakura-designcode). Views: 19; favorites: 3; remixes: 0.
+Tags: testimonial, section, animated, bento, social-proof.
 ## Overview
-Canvas Engine Pricing Section is designed for comparing plans and supporting conversion decisions. Key features include plan comparison blocks and conversion-oriented actions. Built with custom CSS, it is suitable for subscription pricing pages and plan comparison experiences.
+Partner Testimonials Testimonial Section is designed for showcasing social proof and customer credibility. Key features include reusable structure, responsive behavior, and production-ready presentation. It is suitable for component libraries and responsive product interfaces.
 
-Kinetics Products Solutions Documentation Pricing Sign in Start Building Engine v2.0 is now live Responsive intelligence for modern surfaces. Create immersive digital experiences with lightweight, interactive mesh backg…
+Partner Experiences Hear From the Teams We've Partnered With "The strategic vision they brought transformed our fragmented concepts into a seamless ecosystem. Their execution was flawless from start to finish." Marcus V…
 ## Composition
 Use the attached HTML reference as the source of truth. Preserve the visible hierarchy, first-screen composition, section rhythm, density, and interaction tone before adapting copy or content.
-Key visible headings include: Responsive intelligence for modern surfaces.; Hardware Accelerated; Spatial Reactivity; Absolute Control.
+Key visible headings include: Hear From the Teams; We've Partnered With; Marcus Vance; Clara Lin; James Carter; Elena Rostova.
 ## Colors
-Anchor the palette in primary #60A5FA, secondary #09090B, accent #60A5FA, background #09090B, surface #18181B, text-primary #FFFFFF. Keep background, surface, text, and border roles distinct so generated layouts retain the same contrast pattern as the source.
+Anchor the palette in primary #030303, secondary #111111, accent #030303, background #030303, surface #1A1A1A, text-primary #FFFFFF. Keep background, surface, text, and border roles distinct so generated layouts retain the same contrast pattern as the source.
 ## Typography
-Use Inter for display moments and Inter for body copy unless the HTML clearly demands a compatible fallback. Labels and technical metadata should use JetBrains Mono or an equivalent mono face.
+Use Inter for display moments and Playfair Display for body copy unless the HTML clearly demands a compatible fallback. Labels and technical metadata should use JetBrains Mono or an equivalent mono face.
 ## Layout
 Keep spacing deliberate and stable. Favor the same grid direction, max-width behavior, card density, and responsive stacking seen in the HTML. Do not replace distinctive source structures with generic SaaS sections.
 ## Components
