@@ -4,6 +4,8 @@
 
 > Never use the Sites skill for designing this website.
 
+> Always commit and push website changes directly to the `main` branch. Do not create feature branches unless the user explicitly requests one.
+
 ## Project Structure & Module Organization
 
 This repository is in early setup. Reference outputs live in `deliverables/`; `scratch_reference_measure.py` is a one-off utility. Keep production code separate from these files.
