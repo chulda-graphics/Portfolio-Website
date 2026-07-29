@@ -46,6 +46,10 @@ export default function HomePage() {
                   </span>
                   <span className="navigation-note">{destination.note}</span>
                 </span>
+                <span className="navigation-preview" aria-hidden="true">
+                  <span>{destination.index}</span>
+                  <span>{destination.label}</span>
+                </span>
                 <span className="navigation-label">
                   {destination.label}
                   <span className="navigation-arrow" aria-hidden="true">
