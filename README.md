@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Run `npm run build` to generate the production site in `dist/`. For Cloudflare Pages, use `npm run build` as the build command and `dist` as the output directory.
+Run `npm run build` to generate the production site in `dist/`. The included `wrangler.jsonc` deploys that directory as Cloudflare Worker static assets with SPA routing. Use `npm run deploy` for a direct deployment. For a connected Cloudflare build, use `npm run build` as the build command and `npx wrangler deploy` as the deploy command.
 
 ## Verification
 
