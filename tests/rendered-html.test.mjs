@@ -23,7 +23,7 @@ async function render(pathname = "/") {
   );
 }
 
-test("non-scrolling homepage server-renders the portfolio index and intro shell", async () => {
+test("homepage server-renders the portfolio landing page and intro shell", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -31,10 +31,9 @@ test("non-scrolling homepage server-renders the portfolio index and intro shell"
 
   const html = await response.text();
   for (const [label, href] of [
-    ["Work", "/work"],
+    ["Work", "#work"],
     ["Process", "/process"],
     ["About", "/about"],
-    ["Contact", "/contact"],
   ]) {
     assert.match(html, new RegExp(`href=["']${href}["']`, "i"));
     assert.match(html, new RegExp(`>${label}<`, "i"));
@@ -42,9 +41,10 @@ test("non-scrolling homepage server-renders the portfolio index and intro shell"
   assert.match(html, /class=["']site-loader["']/i);
   assert.match(html, /class=["']loader-wordmark["']/i);
   assert.match(html, /class=["']route-transition["']/i);
-  assert.equal((html.match(/class=["']navigation-preview["']/gi) ?? []).length, 4);
-  assert.doesNotMatch(html, /MacBook|loading-screen|carousel|custom-cursor/i);
-  assert.doesNotMatch(html, /<video|Motion gives software|Selected projects/i);
+  assert.match(html, /Make software impossible to overlook/i);
+  assert.match(html, /chulda\.graphics2022@gmail\.com/i);
+  assert.equal((html.match(/<video\b/gi) ?? []).length, 2);
+  assert.doesNotMatch(html, /MacBook|custom-cursor|SECTION 0|QUESTION 0/i);
 });
 
 for (const [route, title] of [
