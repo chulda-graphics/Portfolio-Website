@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowDown } from "@phosphor-icons/react/dist/ssr";
 import { PageMotion } from "./PageMotion";
 import { SiteFooter, SiteNav } from "./SiteChrome";
@@ -23,7 +24,7 @@ export function CaseStudyPage({ project }: { project: CaseStudy }) {
         <div className="case-hero-meta"><span>{project.descriptor}</span><span>Strategy / Direction / Motion</span></div>
         <div className="route-line-clip"><h1 className="route-hero-line">{project.title}</h1></div>
         <div className="case-hero-bottom"><p className="route-hero-copy">{project.summary}</p><Link className="icon-link" href="#film">Watch the final film <ArrowDown size={14} aria-hidden="true" /></Link></div>
-        <div className={`case-art ${project.accent} route-hero-art scale-reveal`}><div className="case-art-orbit"><i /><i /><i /></div><strong>{project.title}</strong><span>PLAY FILM</span></div>
+        <div className={`case-art ${project.accent} route-hero-art scale-reveal`}><Image src={project.poster} alt={`${project.title} project artwork`} fill priority sizes="(max-width: 899px) 100vw, 92vw" /><div className="case-art-orbit"><i /><i /><i /></div><strong>{project.title}</strong><span>PLAY FILM</span></div>
       </section>
 
       <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><video controls playsInline preload="metadata" poster={project.poster} aria-label={`${project.title} final film`}><source src={project.videoUrl} type="video/mp4" />Your browser does not support HTML video.</video><b>FULL FILM</b></div></section>
