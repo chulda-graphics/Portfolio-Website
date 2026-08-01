@@ -868,3 +868,45 @@ body { font-family: "Outfit Variable", Arial, sans-serif; }
 @media (prefers-reduced-motion: reduce) {
   .posters-container { display: none; }
 }
+
+.process-stepper-section { padding: 0 var(--pad) clamp(9rem, 15vw, 15rem); background: #050505; color: #fff; }
+.process-stepper-heading { display: grid; grid-template-columns: .55fr 1.45fr; gap: 5vw; align-items: end; margin-bottom: clamp(3rem, 7vw, 7rem); }
+.process-stepper-heading > p { font-family: "JetBrains Mono Variable", monospace; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #a1a1aa; }
+.process-stepper-heading > h2 { max-width: 15ch; margin: 0; font-size: clamp(2.8rem, 6vw, 6rem); line-height: .96; letter-spacing: -.055em; font-weight: 430; }
+.rb-stepper { width: 100%; }
+.rb-stepper-shell { width: 100%; overflow: hidden; border: 1px solid #27272a; border-radius: 8px; background: #111; box-shadow: 0 24px 72px rgba(0,0,0,.24); }
+.rb-stepper-indicators { display: flex; width: 100%; align-items: center; padding: clamp(1.25rem, 3vw, 2.5rem); border-bottom: 1px solid #27272a; }
+.rb-stepper-indicator-group { display: contents; }
+.rb-stepper-indicator { display: grid; flex: 0 0 2.25rem; width: 2.25rem; height: 2.25rem; place-items: center; padding: 0; border: 1px solid #27272a; border-radius: 50%; font: 600 .75rem "JetBrains Mono Variable", monospace; cursor: pointer; }
+.rb-stepper-indicator:focus-visible, .rb-stepper-back:focus-visible, .rb-stepper-next:focus-visible, .rb-stepper-complete button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.rb-stepper-indicator:disabled { cursor: default; opacity: .55; }
+.rb-stepper-connector { height: 1px; flex: 1; margin: 0 .75rem; overflow: hidden; background: #27272a; }
+.rb-stepper-connector i { display: block; width: 100%; height: 100%; transform-origin: left; background: #f4f4f4; }
+.rb-stepper-content { position: relative; overflow: hidden; }
+.rb-stepper-slide { position: absolute; inset: 0 0 auto; }
+.rb-stepper-step { min-height: 24rem; padding: clamp(2rem, 5vw, 5rem); display: grid; grid-template-columns: .55fr 1.45fr; gap: 1rem 5vw; align-content: start; }
+.process-stepper-label { font: 600 .7rem "JetBrains Mono Variable", monospace; text-transform: uppercase; letter-spacing: .08em; color: #a1a1aa; }
+.rb-stepper-step h2 { max-width: 12ch; margin: 0; font-size: clamp(2.5rem, 5vw, 5rem); line-height: .94; letter-spacing: -.05em; font-weight: 430; }
+.rb-stepper-step > p { grid-column: 2; max-width: 35rem; margin: 1.5rem 0 0; color: #a1a1aa; font-size: 1.05rem; line-height: 1.6; }
+.process-stepper-stages { grid-column: 2; display: flex; gap: .5rem; margin-top: 2rem; }
+.process-stepper-stages span { padding: .65rem .85rem; border: 1px solid #27272a; border-radius: 999px; font: 600 .65rem "JetBrains Mono Variable", monospace; text-transform: uppercase; letter-spacing: .07em; }
+.rb-stepper-footer { min-height: 6.5rem; padding: 1.5rem clamp(2rem, 5vw, 5rem); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #27272a; }
+.rb-stepper-progress { font: 600 .68rem "JetBrains Mono Variable", monospace; color: #a1a1aa; text-transform: uppercase; letter-spacing: .08em; }
+.rb-stepper-actions { display: flex; gap: .75rem; }
+.rb-stepper-back, .rb-stepper-next, .rb-stepper-complete button { min-height: 2.75rem; padding: .75rem 1rem; border: 1px solid #27272a; border-radius: 8px; font: 600 .68rem "JetBrains Mono Variable", monospace; text-transform: uppercase; letter-spacing: .07em; cursor: pointer; }
+.rb-stepper-back { background: transparent; color: #a1a1aa; }
+.rb-stepper-next, .rb-stepper-complete button { background: #f4f4f4; color: #050505; }
+.rb-stepper-complete { min-height: 30.5rem; padding: clamp(2rem, 5vw, 5rem); display: grid; grid-template-columns: auto 1fr auto; gap: 2rem; align-items: center; }
+.rb-stepper-complete h2 { margin: 0 0 .5rem; font-size: clamp(2rem, 4vw, 4rem); letter-spacing: -.045em; }
+.rb-stepper-complete p { margin: 0; color: #a1a1aa; }
+
+@media (max-width: 700px) {
+  .process-stepper-heading, .rb-stepper-step { grid-template-columns: 1fr; }
+  .rb-stepper-step { min-height: 29rem; }
+  .rb-stepper-step > p, .process-stepper-stages { grid-column: 1; }
+  .rb-stepper-connector { margin-inline: .35rem; }
+  .rb-stepper-indicator { flex-basis: 1.9rem; width: 1.9rem; height: 1.9rem; }
+  .rb-stepper-footer { align-items: flex-start; gap: 1rem; }
+  .rb-stepper-complete { min-height: 35rem; grid-template-columns: 1fr; align-content: center; }
+  .rb-stepper-complete button { justify-self: start; }
+}
