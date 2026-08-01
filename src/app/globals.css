@@ -848,3 +848,23 @@ body { font-family: "Outfit Variable", Arial, sans-serif; }
 @media (prefers-reduced-motion: reduce) {
   .nav-shell, .inner-nav { backdrop-filter: none; }
 }
+
+.posters-container {
+  position: absolute;
+  inset: clamp(2.8rem, 4.5vw, 4.75rem) clamp(1rem, 2vw, 2rem) clamp(1rem, 2vw, 2rem);
+  z-index: 3;
+  overflow: hidden;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  background: #050505;
+  opacity: 0;
+  transition: opacity .6s ease;
+  touch-action: pan-y;
+}
+.posters-container[data-ready="true"] { opacity: 1; }
+.posters-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.posters-canvas:active { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .posters-container { display: none; }
+}

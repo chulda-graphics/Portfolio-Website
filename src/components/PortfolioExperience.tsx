@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, ArrowUp, ArrowUpRight } from "@phosphor-icons/react";
+import { FlyingPosters } from "./FlyingPosters";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -18,6 +19,11 @@ const phases = [
 ];
 
 const clients = ["STILLSEARCH", "NORTHSTAR AI", "LAYER", "SIGNAL", "FORM", "ARC SYSTEMS"];
+const posterItems = [
+  "/assets/illustrations/stillsearch-signal.webp",
+  "/assets/illustrations/demo-reel-motion.webp",
+  "/assets/illustrations/coming-soon-system.webp",
+];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <span aria-hidden="true" className={diagonal ? "arrow diagonal" : "arrow"}><ArrowRight size={16} /></span>;
@@ -119,6 +125,7 @@ export function PortfolioExperience() {
         <div className="hero-visual reveal-media">
           <div className="visual-caption"><span>Product story / Motion system / Launch film</span><span>Selected work — 2025</span></div>
           <MotionWindow />
+          <FlyingPosters items={posterItems} planeWidth={700} planeHeight={440} distortion={4} scrollEase={0.045} cameraZ={18} />
           <div className="hero-orb orb-a" /><div className="hero-orb orb-b" />
         </div>
       </section>
