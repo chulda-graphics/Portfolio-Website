@@ -134,17 +134,17 @@ export function PortfolioExperience() {
         <div className="bento-grid">
           <Link className="project-card project-main" href="/work/stillsearch">
             <div className="card-top"><span>StillSearch</span><span>SaaS / Product film</span><Arrow diagonal /></div>
-            <div className="card-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/stillsearch-signal.jpg" alt="Streams of information converging into one precise search signal" fill sizes="(max-width: 899px) 100vw, 66vw" /></div>
+            <div className="card-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/stillsearch-signal.webp" alt="Streams of information converging into one precise search signal" fill sizes="(max-width: 899px) 100vw, 66vw" /></div>
             <div className="card-bottom"><h3>Making discovery feel effortless.</h3><p>A product story that turns a complex AI search workflow into one clear, human idea.</p></div>
           </Link>
           <Link className="project-card project-reel" href="/work/showreel">
             <div className="card-top"><span>Motion reel</span><span>Selected moments</span><Arrow diagonal /></div>
-            <div className="card-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/demo-reel-motion.jpg" alt="Sculptural frames and timing marks arranged as a motion sequence" fill sizes="(max-width: 899px) 100vw, 34vw" /></div>
+            <div className="card-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/demo-reel-motion.webp" alt="Sculptural frames and timing marks arranged as a motion sequence" fill sizes="(max-width: 899px) 100vw, 34vw" /></div>
             <div className="card-bottom"><h3>Ideas, made visible.</h3></div>
           </Link>
           <Link className="project-card project-next" href="/work/coming-soon">
             <div className="card-top"><span>Next collaboration</span><Arrow diagonal /></div>
-            <div className="card-media next-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/coming-soon-system.jpg" alt="A modular digital product system being assembled" fill sizes="(max-width: 899px) 100vw, 34vw" /></div>
+            <div className="card-media next-media reveal-media"><Image className="card-illustration" src="/assets/illustrations/coming-soon-system.webp" alt="A modular digital product system being assembled" fill sizes="(max-width: 899px) 100vw, 34vw" /></div>
             <div className="card-bottom"><h3>Your product could be next.</h3></div>
           </Link>
         </div>

@@ -834,3 +834,17 @@ body { font-family: "Outfit Variable", Arial, sans-serif; }
 .case-film, .case-overview, .case-story, .process-principles { background: #f4f4f4; color: #111111; }
 .case-art, .film-frame, .story-visual, .about-portrait, .capability-grid, .contact-grid,
 .soon-orbit, .case-outcome { border-color: #27272a; border-radius: 8px; background: #111111; color: #ffffff; }
+
+/* Skip off-screen paint and layout work while retaining stable scroll geometry. */
+.statement, .work, .marquee, .belief, .footer,
+.work-list, .case-film, .case-overview, .case-story, .case-outcome,
+.process-manifesto, .phase-list, .process-principles,
+.about-belief, .about-columns, .capability-grid, .resume-strip,
+.contact-grid, .route-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-shell, .inner-nav { backdrop-filter: none; }
+}

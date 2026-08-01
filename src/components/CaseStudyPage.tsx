@@ -27,7 +27,7 @@ export function CaseStudyPage({ project }: { project: CaseStudy }) {
         <div className={`case-art ${project.accent} route-hero-art scale-reveal`}><Image src={project.poster} alt={`${project.title} project artwork`} fill priority sizes="(max-width: 899px) 100vw, 92vw" /><div className="case-art-orbit"><i /><i /><i /></div><strong>{project.title}</strong><span>PLAY FILM</span></div>
       </section>
 
-      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><video controls playsInline preload="metadata" poster={project.poster} aria-label={`${project.title} final film`}><source src={project.videoUrl} type="video/mp4" />Your browser does not support HTML video.</video><b>FULL FILM</b></div></section>
+      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><video controls playsInline preload="none" poster={project.poster} aria-label={`${project.title} final film`}><source src={project.videoUrl} type="video/mp4" />Your browser does not support HTML video.</video><b>FULL FILM</b></div></section>
 
       <section className="case-overview"><p>The brief</p><h2>{project.summary}</h2><div><span>Role<br /><strong>Creative direction<br />Design & animation</strong></span><span>Deliverables<br /><strong>Product film<br />Motion system</strong></span></div></section>
 

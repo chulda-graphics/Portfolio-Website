@@ -21,7 +21,7 @@ const project = {
   ],
   nextLabel: "Explore the process.", nextHref: "/process",
   videoUrl: "https://pub-8843028733224946913b21df4054c3ae.r2.dev/Video%20Demo%20Reel%202026.mp4",
-  poster: "/assets/illustrations/demo-reel-motion.jpg",
+  poster: "/assets/illustrations/demo-reel-motion.webp",
 };
 
 export default function ShowreelPage() { return <CaseStudyPage project={project} />; }

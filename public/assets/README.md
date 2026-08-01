@@ -4,11 +4,11 @@ This directory is the source of truth for imagery and external media displayed b
 
 ## Generated illustrations
 
-- `illustrations/stillsearch-signal.jpg` — AI search signal-convergence artwork used by StillSearch.
-- `illustrations/demo-reel-motion.jpg` — motion choreography artwork used by the Demo Reel.
-- `illustrations/coming-soon-system.jpg` — modular work-in-progress artwork used by Coming Soon.
+- `illustrations/stillsearch-signal.webp` — AI search signal-convergence artwork used by StillSearch.
+- `illustrations/demo-reel-motion.webp` — motion choreography artwork used by the Demo Reel.
+- `illustrations/coming-soon-system.webp` — modular work-in-progress artwork used by Coming Soon.
 
-The illustrations were generated specifically for this portfolio using OpenAI image generation, then converted to optimized JPEG assets. They contain no third-party stock imagery.
+The illustrations were generated specifically for this portfolio using OpenAI image generation, then converted to optimized WebP assets. They contain no third-party stock imagery.
 
 ## Project videos
 

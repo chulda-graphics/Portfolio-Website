@@ -8,9 +8,9 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 export const metadata: Metadata = { title: "Work — Chulda", description: "Selected SaaS, AI, and digital product motion work." };
 
 const projects = [
-  { href: "/work/stillsearch", name: "StillSearch", type: "AI search / Product film", copy: "Making discovery feel effortless.", className: "work-still", image: "/assets/illustrations/stillsearch-signal.jpg" },
-  { href: "/work/showreel", name: "Motion reel", type: "Selected moments / 2026", copy: "Ideas, made visible.", className: "work-reel", image: "/assets/illustrations/demo-reel-motion.jpg" },
-  { href: "/work/coming-soon", name: "In progress", type: "New case study", copy: "The next product story is taking shape.", className: "work-soon", image: "/assets/illustrations/coming-soon-system.jpg" },
+  { href: "/work/stillsearch", name: "StillSearch", type: "AI search / Product film", copy: "Making discovery feel effortless.", className: "work-still", image: "/assets/illustrations/stillsearch-signal.webp" },
+  { href: "/work/showreel", name: "Motion reel", type: "Selected moments / 2026", copy: "Ideas, made visible.", className: "work-reel", image: "/assets/illustrations/demo-reel-motion.webp" },
+  { href: "/work/coming-soon", name: "In progress", type: "New case study", copy: "The next product story is taking shape.", className: "work-soon", image: "/assets/illustrations/coming-soon-system.webp" },
 ];
 
 export default function WorkPage() {

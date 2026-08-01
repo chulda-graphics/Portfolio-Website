@@ -21,7 +21,7 @@ const project = {
   ],
   nextLabel: "Watch the motion reel.", nextHref: "/work/showreel",
   videoUrl: "https://pub-8843028733224946913b21df4054c3ae.r2.dev/StillSearch%20Launch%20Video.mp4",
-  poster: "/assets/illustrations/stillsearch-signal.jpg",
+  poster: "/assets/illustrations/stillsearch-signal.webp",
 };
 
 export default function StillSearchPage() { return <CaseStudyPage project={project} />; }
