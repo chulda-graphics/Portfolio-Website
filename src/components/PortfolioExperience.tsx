@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -95,9 +96,9 @@ export function PortfolioExperience() {
     <main ref={root} className="site-shell">
       <header className="nav-wrap">
         <nav className="nav-shell" aria-label="Primary navigation">
-          <a className="brand" href="#top" aria-label="Chulda home"><span>C</span> CHULDA</a>
-          <div className="nav-links"><a href="#work">Work</a><a href="#process">Process</a><a href="#about">About</a></div>
-          <a className="nav-contact" href="mailto:hello@chulda.graphics">Let’s talk <Arrow diagonal /></a>
+          <Link className="brand" href="/" aria-label="Chulda home"><span>C</span> CHULDA</Link>
+          <div className="nav-links"><Link href="/work">Work</Link><Link href="/process">Process</Link><Link href="/about">About</Link></div>
+          <Link className="nav-contact" href="/contact">Let’s talk <Arrow diagonal /></Link>
         </nav>
       </header>
 
@@ -110,7 +111,7 @@ export function PortfolioExperience() {
           </div>
           <div className="hero-aside">
             <p className="hero-copy">I turn complex SaaS and AI products into clear, engaging stories people understand—and remember.</p>
-            <div className="hero-actions"><a className="button primary" href="#work">See the thinking <Arrow /></a><a className="text-link" href="#process">How I work <Arrow diagonal /></a></div>
+            <div className="hero-actions"><Link className="button primary" href="/work">See the thinking <Arrow /></Link><Link className="text-link" href="/process">How I work <Arrow diagonal /></Link></div>
           </div>
         </div>
         <div className="hero-visual reveal-media">
@@ -129,21 +130,21 @@ export function PortfolioExperience() {
       <section id="work" className="work section-pad">
         <div className="section-heading"><h2>Selected work</h2><p>Built to clarify.<br />Designed to connect.</p></div>
         <div className="bento-grid">
-          <a className="project-card project-main" href="#stillsearch">
+          <Link className="project-card project-main" href="/work/stillsearch">
             <div className="card-top"><span>StillSearch</span><span>SaaS / Product film</span><Arrow diagonal /></div>
             <div className="card-media reveal-media"><MotionWindow /></div>
             <div className="card-bottom"><h3>Making discovery feel effortless.</h3><p>A product story that turns a complex AI search workflow into one clear, human idea.</p></div>
-          </a>
-          <a className="project-card project-reel" href="#showreel">
+          </Link>
+          <Link className="project-card project-reel" href="/work/showreel">
             <div className="card-top"><span>Motion reel</span><span>Selected moments</span><Arrow diagonal /></div>
             <div className="card-media reveal-media"><MotionWindow variant="reel" /></div>
             <div className="card-bottom"><h3>Ideas, made visible.</h3></div>
-          </a>
-          <a className="project-card project-next" href="mailto:hello@chulda.graphics">
+          </Link>
+          <Link className="project-card project-next" href="/work/coming-soon">
             <div className="card-top"><span>Next collaboration</span><Arrow diagonal /></div>
             <div className="next-rings" aria-hidden="true"><i /><i /><i /></div>
             <div className="card-bottom"><h3>Your product could be next.</h3></div>
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -167,7 +168,7 @@ export function PortfolioExperience() {
 
       <footer id="contact" className="footer section-pad">
         <div className="footer-top"><span>Have a product worth understanding?</span><span>Available for select projects</span></div>
-        <a href="mailto:hello@chulda.graphics" className="footer-cta">Let’s make it<br /><em>click.</em><Arrow diagonal /></a>
+        <Link href="/contact" className="footer-cta">Let’s make it<br /><em>click.</em><Arrow diagonal /></Link>
         <div className="footer-bottom"><span>© 2026 Chulda</span><div><a href="#">LinkedIn</a><a href="#">Behance</a><a href="#">Instagram</a></div><a href="#top">Back to top ↑</a></div>
       </footer>
     </main>
