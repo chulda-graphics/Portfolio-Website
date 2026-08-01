@@ -12,6 +12,8 @@ Use `@phosphor-icons/react` as the default icon system for interface actions. Do
 
 This repository is a clean starting point for a Next.js motion-design portfolio. Use the App Router and keep route code under `src/app/` (for example, `src/app/work/[slug]/page.tsx`). Place reusable UI in `src/components/`, animation utilities in `src/lib/motion/`, styles in `src/styles/`, and static media in `public/`. Group project assets by slug, such as `public/projects/stillsearch/`. Store tests beside covered code or in `tests/` for complete user flows.
 
+Store generated illustrations, project imagery, video metadata, and other display media in [`public/assets/`](public/assets/). Follow its asset manifest when adding or replacing landing-page content. Prefer original project-specific illustrations over stock imagery, preserve meaningful filenames, and optimize raster assets before committing them.
+
 ## Build, Test, and Development Commands
 
 The application has not been scaffolded yet. Once `package.json` is added, expose these standard npm scripts and keep this section synchronized with them:

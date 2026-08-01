@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, Play } from "@phosphor-icons/react/dist/ssr";
+import { ArrowDown } from "@phosphor-icons/react/dist/ssr";
 import { PageMotion } from "./PageMotion";
 import { SiteFooter, SiteNav } from "./SiteChrome";
 
@@ -11,6 +11,8 @@ type CaseStudy = {
   sections: Array<{ title: string; copy: string }>;
   nextLabel: string;
   nextHref: string;
+  videoUrl: string;
+  poster: string;
 };
 
 export function CaseStudyPage({ project }: { project: CaseStudy }) {
@@ -24,7 +26,7 @@ export function CaseStudyPage({ project }: { project: CaseStudy }) {
         <div className={`case-art ${project.accent} route-hero-art scale-reveal`}><div className="case-art-orbit"><i /><i /><i /></div><strong>{project.title}</strong><span>PLAY FILM</span></div>
       </section>
 
-      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><button aria-label={`Play ${project.title} film`}><Play size={24} weight="fill" aria-hidden="true" /></button><b>00:58</b></div></section>
+      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><video controls playsInline preload="metadata" poster={project.poster} aria-label={`${project.title} final film`}><source src={project.videoUrl} type="video/mp4" />Your browser does not support HTML video.</video><b>FULL FILM</b></div></section>
 
       <section className="case-overview"><p>The brief</p><h2>{project.summary}</h2><div><span>Role<br /><strong>Creative direction<br />Design & animation</strong></span><span>Deliverables<br /><strong>Product film<br />Motion system</strong></span></div></section>
 

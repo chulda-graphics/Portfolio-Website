@@ -20,6 +20,8 @@ const project = {
     { title: "Credits", copy: "A selection of independent direction, collaborative client work, and creative partnerships. Full credits accompany each published project." },
   ],
   nextLabel: "Explore the process.", nextHref: "/process",
+  videoUrl: "https://pub-8843028733224946913b21df4054c3ae.r2.dev/Video%20Demo%20Reel%202026.mp4",
+  poster: "/assets/illustrations/demo-reel-motion.jpg",
 };
 
 export default function ShowreelPage() { return <CaseStudyPage project={project} />; }

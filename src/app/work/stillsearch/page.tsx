@@ -20,6 +20,8 @@ const project = {
     { title: "Behind the scenes", copy: "Modular scenes and reusable timing systems let the launch film expand into shorter social, product, and sales-support edits." },
   ],
   nextLabel: "Watch the motion reel.", nextHref: "/work/showreel",
+  videoUrl: "https://pub-8843028733224946913b21df4054c3ae.r2.dev/StillSearch%20Launch%20Video.mp4",
+  poster: "/assets/illustrations/stillsearch-signal.jpg",
 };
 
 export default function StillSearchPage() { return <CaseStudyPage project={project} />; }

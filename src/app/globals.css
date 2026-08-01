@@ -91,9 +91,11 @@ a:hover .arrow.diagonal { transform: rotate(-45deg) translateX(.3rem); }
 .project-reel, .project-next { grid-column: span 4; grid-row: span 1; }
 .card-top { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 1.2rem; font-size: .67rem; text-transform: uppercase; letter-spacing: .075em; }
 .card-top .arrow { font-size: 1.1rem; }
-.card-media { overflow: hidden; margin: 0 1.2rem; flex: 1; min-height: 17rem; will-change: transform, opacity; }
+.card-media { overflow: hidden; margin: 0 1.2rem; flex: 1; min-height: 17rem; position: relative; will-change: transform, opacity; }
 .card-media .motion-window { width: 100%; height: 100%; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
-.project-card:hover .card-media .motion-window { transform: scale(1.035); }
+.card-illustration { object-fit: cover; transition: transform .8s cubic-bezier(.2,.8,.2,1), filter .8s ease; }
+.project-card:hover .card-media .motion-window,
+.project-card:hover .card-illustration { transform: scale(1.035); }
 .card-bottom { padding: 1.3rem 1.2rem 1.5rem; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(12rem, .7fr); gap: 2rem; align-items: end; }
 .card-bottom h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 3.2rem); line-height: 1; letter-spacing: -.045em; font-weight: 470; }
 .card-bottom p { margin: 0; font-size: .83rem; line-height: 1.4; }
@@ -103,6 +105,7 @@ a:hover .arrow.diagonal { transform: rotate(-45deg) translateX(.3rem); }
 .project-reel .card-bottom h3, .project-next .card-bottom h3 { font-size: clamp(1.6rem, 2.5vw, 2.7rem); }
 .project-next { background: var(--acid); }
 .project-next .card-top { grid-template-columns: 1fr auto; }
+.project-next .next-media { min-height: 11rem; }
 .project-next .card-bottom { grid-template-columns: 1fr; margin-top: auto; }
 .next-rings { position: absolute; inset: 3rem -3rem -8rem 6rem; display: grid; place-items: center; }
 .next-rings i { position: absolute; width: 9rem; aspect-ratio: 1; border: 1px solid rgba(18,19,15,.35); border-radius: 50%; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
@@ -433,6 +436,7 @@ a:hover .arrow.diagonal { transform: rotate(-45deg) translateX(.3rem); }
 .film-frame { min-height: 70vh; position: relative; display: grid; place-items: center; background: #c9c7bf; overflow: hidden; will-change: transform, opacity; }
 .film-frame::before { content: ""; position: absolute; width: 55%; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--blue), var(--acid), #ef623e, var(--blue)); filter: blur(2px); }
 .film-frame button { z-index: 2; width: 6rem; height: 6rem; border: 0; border-radius: 50%; background: var(--ink); color: white; cursor: pointer; }
+.film-frame video { position: relative; z-index: 1; width: 100%; height: 70vh; min-height: 30rem; object-fit: cover; background: #050505; }
 .film-frame > span, .film-frame > b { position: absolute; z-index: 2; top: 1.5rem; font-size: .68rem; letter-spacing: .08em; }
 .film-frame > span { left: 1.5rem; }.film-frame > b { right: 1.5rem; }
 .case-overview { padding: 0 var(--pad) clamp(9rem, 16vw, 16rem); background: var(--paper); color: var(--ink); }
@@ -497,7 +501,7 @@ a:hover .arrow.diagonal { transform: rotate(-45deg) translateX(.3rem); }
 @media (max-width: 560px) {
   .route-hero h1, .soon-hero h1, .contact-hero h1 { font-size: clamp(3rem, 16vw, 5rem); }.inner-nav .brand { font-size: .65rem; }.inner-nav .nav-contact { font-size: .6rem; }.route-footer-top span:last-child, .route-footer-bottom > span { display: none; }.route-footer-bottom { align-items: flex-start; flex-direction: column; gap: 1.5rem; }.route-footer-bottom div { gap: 1rem; }
   .contact-hero h1, .soon-hero h1 { max-width: none; font-size: 11.5vw; line-height: .9; }
-  .work-row-art { min-height: 23rem; }.work-row h2 { min-height: 15rem; padding: 2rem; }.case-hero h1 { font-size: 18vw; }.case-art { min-height: 22rem; margin-top: 3rem; }.case-art-orbit i:nth-child(3) { width: 34rem; }.film-frame { min-height: 27rem; }.case-overview > div { gap: 2rem; flex-direction: column; }.story-row { grid-template-columns: 2rem 1fr; gap: 1rem; }.story-visual { min-height: 18rem; }.about-hero h1 { font-size: 14vw; }.capability-grid { gap: 3rem; }.resume-strip { align-items: flex-start; flex-direction: column; }.contact-grid { padding-bottom: 6rem; }
+  .work-row-art { min-height: 23rem; }.work-row h2 { min-height: 15rem; padding: 2rem; }.case-hero h1 { font-size: 18vw; }.case-art { min-height: 22rem; margin-top: 3rem; }.case-art-orbit i:nth-child(3) { width: 34rem; }.film-frame { min-height: 27rem; }.film-frame video { height: 27rem; min-height: 27rem; }.case-overview > div { gap: 2rem; flex-direction: column; }.story-row { grid-template-columns: 2rem 1fr; gap: 1rem; }.story-visual { min-height: 18rem; }.about-hero h1 { font-size: 14vw; }.capability-grid { gap: 3rem; }.resume-strip { align-items: flex-start; flex-direction: column; }.contact-grid { padding-bottom: 6rem; }
 }
 
 /* Route-level Aether overrides must follow the structural route declarations. */
