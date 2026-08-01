@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/outfit";
 import "./globals.css";
 
