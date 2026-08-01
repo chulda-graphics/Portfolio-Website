@@ -544,6 +544,75 @@ body { background: #d8d8d5; color: var(--ink); }
   .hero-heading .line-clip + .line-clip::before { content: none; }
 }
 
+/* Aether visual specification. Geometry and motion hooks remain unchanged. */
+:root {
+  --paper: #050505;
+  --ink: #ffffff;
+  --acid: #ffffff;
+  --blue: #ffffff;
+  --line: #27272a;
+  --border: #27272a;
+  --radius: 8px;
+}
+
+html, body { background: #050505; color: #ffffff; }
+body { font-family: "Outfit Variable", Arial, sans-serif; }
+.site-shell, .route-shell, .work-page, .process-page, .about-page, .contact-page, .case-page, .soon-page,
+.hero, .statement, .work, .process-section, .route-hero, .light-hero, .about-hero, .process-route-hero,
+.contact-hero, .soon-hero { background: #050505; color: #ffffff; }
+
+.nav-shell, .inner-nav {
+  border-color: #27272a;
+  border-radius: 8px;
+  background: rgba(17,17,17,.88);
+  box-shadow: 0 16px 48px rgba(0,0,0,.32);
+}
+.brand, .nav-links a, .inner-nav-links a { color: #ffffff; }
+.brand span { border-radius: 8px; background: #ffffff; color: #050505; }
+.nav-links, .inner-nav-links { border-radius: 8px; background: rgba(255,255,255,.055); }
+.nav-contact, .inner-nav .nav-contact { border: 1px solid #27272a; border-radius: 8px; background: #f4f4f4; color: #050505; }
+
+.hero-heading h1, .hero-heading .accent-line, .route-hero h1, .light-hero h1, .about-hero h1,
+.case-hero h1, .contact-hero h1, .soon-hero h1 { color: #ffffff !important; }
+.light-hero h1 em, .about-hero h1 em, .process-route-hero h1 em, .statement h2 em,
+.process-intro h2 em { color: #a1a1aa; }
+.hero-copy, .route-hero-copy, .statement-foot, .phase-row p { color: #a1a1aa; }
+.button.primary { border: 1px solid #27272a; border-radius: 8px; background: #f4f4f4; color: #050505; }
+.text-link { color: #ffffff; }
+.hero-visual { border-color: #27272a; border-radius: 8px; background: #111111; box-shadow: 0 30px 90px rgba(0,0,0,.45); }
+.hero-visual .motion-window { border-radius: 8px; }
+.hero-orb { background: #ffffff; opacity: .12; }
+
+.project-card, .process-card, .work-row, .story-row, .story-visual, .case-art, .film-frame,
+.about-portrait, .about-columns article, .capability-grid, .contact-grid, .soon-orbit,
+.case-outcome, .route-footer { border: 1px solid #27272a; border-radius: 8px; box-shadow: 0 24px 72px rgba(0,0,0,.24); }
+.project-main, .project-reel, .project-next, .process-card, .process-card:nth-child(2),
+.process-card:nth-child(3), .process-card:nth-child(4), .work-row:first-child, .work-reel,
+.work-soon, .story-row, .story-row:nth-child(even), .story-row:nth-child(3n),
+.about-columns article, .about-columns article:nth-child(2) { background: #111111; color: #ffffff; }
+.card-media, .story-visual { border-radius: 8px; }
+.marquee { border-block: 1px solid #27272a; background: #f4f4f4; color: #050505; }
+.belief, .about-belief, .process-manifesto { background: #111111; color: #ffffff; }
+.footer, .route-footer, .resume-strip { background: #f4f4f4; color: #050505; }
+.footer-cta, .footer-cta em, .route-footer-cta { color: #050505; }
+.footer-top, .footer-bottom, .route-footer-top, .route-footer-bottom { border-color: rgba(5,5,5,.2); }
+
+.work-row-art, .work-reel .work-row-art, .work-soon .work-row-art,
+.case-blue, .case-orange, .story-visual, .visual-2, .visual-3, .visual-4,
+.capability-grid, .contact-grid, .soon-orbit, .case-outcome { background: #111111; color: #ffffff; }
+.case-film, .case-overview, .case-story, .process-principles { background: #f4f4f4; color: #111111; }
+.case-overview .route-hero-copy, .case-story p, .process-principles p { color: #52525b; }
+.outcome-signal span, .portrait-field span { border-radius: 8px; background: #f4f4f4; color: #050505; }
+.phase-row, .phase-row:nth-child(4n+2), .phase-row:nth-child(4n+3), .phase-row:nth-child(4n+4) {
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  background: #111111;
+  color: #ffffff;
+}
+.phase-row p { color: #a1a1aa; }
+.contact-form button { border: 1px solid #27272a; border-radius: 8px; background: #f4f4f4; color: #050505; }
+.contact-footer { color: #a1a1aa; border-color: #27272a; }
+
 @media (max-width: 899px) {
   .nav-shell, .inner-nav { grid-template-columns: 1fr auto; }
   .hero-grid { grid-template-columns: 1fr; }
@@ -744,3 +813,24 @@ body { background: #d8d8d5; color: var(--ink); }
 .contact-footer { border-color: var(--line); }
 .soon-orbit i { border-color: rgba(255,255,255,.28); border-radius: 50%; }
 .soon-orbit span { color: var(--acid); }
+
+/* Aether palette authority; intentionally last in the cascade. */
+.site-shell, .route-shell, .work-page, .process-page, .about-page, .contact-page, .case-page, .soon-page,
+.hero, .statement, .work, .process-section, .route-hero, .light-hero, .about-hero, .process-route-hero,
+.contact-hero, .soon-hero { background: #050505; color: #ffffff; }
+.hero-heading .accent-line, .light-hero h1 em, .about-hero h1 em, .process-route-hero h1 em,
+.statement h2 em, .process-intro h2 em { color: #a1a1aa !important; }
+.route-footer, .footer, .resume-strip { background: #f4f4f4; color: #050505; }
+.work-row, .work-row:first-child, .work-reel, .work-soon,
+.project-main, .project-reel, .project-next,
+.story-row, .story-row:nth-child(even), .story-row:nth-child(3n),
+.about-columns article, .about-columns article:nth-child(2),
+.phase-row, .phase-row:nth-child(4n+2), .phase-row:nth-child(4n+3), .phase-row:nth-child(4n+4) {
+  border-color: #27272a;
+  border-radius: 8px;
+  background: #111111;
+  color: #ffffff;
+}
+.case-film, .case-overview, .case-story, .process-principles { background: #f4f4f4; color: #111111; }
+.case-art, .film-frame, .story-visual, .about-portrait, .capability-grid, .contact-grid,
+.soon-orbit, .case-outcome { border-color: #27272a; border-radius: 8px; background: #111111; color: #ffffff; }
