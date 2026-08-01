@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowDown, Play } from "@phosphor-icons/react/dist/ssr";
 import { PageMotion } from "./PageMotion";
 import { SiteFooter, SiteNav } from "./SiteChrome";
 
@@ -19,11 +20,11 @@ export function CaseStudyPage({ project }: { project: CaseStudy }) {
       <section className="case-hero route-hero">
         <div className="case-hero-meta"><span>{project.descriptor}</span><span>Strategy / Direction / Motion</span></div>
         <div className="route-line-clip"><h1 className="route-hero-line">{project.title}</h1></div>
-        <div className="case-hero-bottom"><p className="route-hero-copy">{project.summary}</p><Link href="#film">Watch the final film <span>↓</span></Link></div>
+        <div className="case-hero-bottom"><p className="route-hero-copy">{project.summary}</p><Link className="icon-link" href="#film">Watch the final film <ArrowDown size={14} aria-hidden="true" /></Link></div>
         <div className={`case-art ${project.accent} route-hero-art scale-reveal`}><div className="case-art-orbit"><i /><i /><i /></div><strong>{project.title}</strong><span>PLAY FILM</span></div>
       </section>
 
-      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><button aria-label={`Play ${project.title} film`}>▶</button><b>00:58</b></div></section>
+      <section id="film" className="case-film"><div className="film-frame scale-reveal"><span>FINAL FILM</span><button aria-label={`Play ${project.title} film`}><Play size={24} weight="fill" aria-hidden="true" /></button><b>00:58</b></div></section>
 
       <section className="case-overview"><p>The brief</p><h2>{project.summary}</h2><div><span>Role<br /><strong>Creative direction<br />Design & animation</strong></span><span>Deliverables<br /><strong>Product film<br />Motion system</strong></span></div></section>
 

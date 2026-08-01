@@ -6,6 +6,8 @@
 
 Never use the Sites skill for designing this website. Work directly in the Next.js repository and independently perform all safe, in-scope implementation, app-starting, and verification tasks available to you.
 
+Use `@phosphor-icons/react` as the default icon system for interface actions. Do not use emoji, Unicode arrows, or hand-authored SVGs when an equivalent Phosphor icon exists. Import from the package's SSR entry point in Server Components, mark decorative icons `aria-hidden`, and provide accessible names for icon-only controls.
+
 ## Project Structure & Module Organization
 
 This repository is a clean starting point for a Next.js motion-design portfolio. Use the App Router and keep route code under `src/app/` (for example, `src/app/work/[slug]/page.tsx`). Place reusable UI in `src/components/`, animation utilities in `src/lib/motion/`, styles in `src/styles/`, and static media in `public/`. Group project assets by slug, such as `public/projects/stillsearch/`. Store tests beside covered code or in `tests/` for complete user flows.

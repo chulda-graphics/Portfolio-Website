@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowRight, ArrowUp, ArrowUpRight } from "@phosphor-icons/react";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -18,7 +19,7 @@ const phases = [
 const clients = ["STILLSEARCH", "NORTHSTAR AI", "LAYER", "SIGNAL", "FORM", "ARC SYSTEMS"];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <span aria-hidden="true" className={diagonal ? "arrow diagonal" : "arrow"}>→</span>;
+  return <span aria-hidden="true" className={diagonal ? "arrow diagonal" : "arrow"}><ArrowRight size={16} /></span>;
 }
 
 function MotionWindow({ variant = "search" }: { variant?: "search" | "reel" }) {
@@ -29,7 +30,7 @@ function MotionWindow({ variant = "search" }: { variant?: "search" | "reel" }) {
         <div className="search-stage">
           <div className="orbit orbit-one" /><div className="orbit orbit-two" />
           <div className="search-copy"><span>FIND THE SIGNAL</span><strong>Search less.<br />Discover more.</strong></div>
-          <div className="search-ui"><span>What are you looking for?</span><b>↗</b></div>
+          <div className="search-ui"><span>What are you looking for?</span><b><ArrowUpRight size={15} aria-hidden="true" /></b></div>
         </div>
       ) : (
         <div className="reel-stage"><span>PLAY</span><strong>00:58</strong><div className="reel-disc" /></div>
@@ -169,7 +170,7 @@ export function PortfolioExperience() {
       <footer id="contact" className="footer section-pad">
         <div className="footer-top"><span>Have a product worth understanding?</span><span>Available for select projects</span></div>
         <Link href="/contact" className="footer-cta">Let’s make it<br /><em>click.</em><Arrow diagonal /></Link>
-        <div className="footer-bottom"><span>© 2026 Chulda</span><div><a href="#">LinkedIn</a><a href="#">Behance</a><a href="#">Instagram</a></div><a href="#top">Back to top ↑</a></div>
+        <div className="footer-bottom"><span>© 2026 Chulda</span><div><a href="#">LinkedIn</a><a href="#">Behance</a><a href="#">Instagram</a></div><a className="icon-link" href="#top">Back to top <ArrowUp size={14} aria-hidden="true" /></a></div>
       </footer>
     </main>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 
 const links = [
   ["Home", "/"],
@@ -14,7 +15,7 @@ export function SiteNav({ inverse = false }: { inverse?: boolean }) {
       <nav className="inner-nav" aria-label="Primary navigation">
         <Link className="brand" href="/" aria-label="Chulda home"><span>C</span> CHULDA</Link>
         <div className="inner-nav-links">{links.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</div>
-        <Link className="nav-contact" href="/contact">Start a project <b aria-hidden="true">↗</b></Link>
+        <Link className="nav-contact" href="/contact">Start a project <b aria-hidden="true"><ArrowUpRight size={14} /></b></Link>
       </nav>
     </header>
   );
@@ -24,7 +25,7 @@ export function SiteFooter({ nextLabel = "Make your product click.", nextHref = 
   return (
     <footer className="route-footer">
       <div className="route-footer-top"><span>Available for select collaborations</span><span>SaaS / AI / Digital products</span></div>
-      <Link className="route-footer-cta" href={nextHref}>{nextLabel}<b aria-hidden="true">↗</b></Link>
+      <Link className="route-footer-cta" href={nextHref}>{nextLabel}<b aria-hidden="true"><ArrowUpRight size="1em" /></b></Link>
       <div className="route-footer-bottom"><span>© 2026 Chulda</span><div><a href="https://linkedin.com" rel="noreferrer">LinkedIn</a><a href="https://behance.net" rel="noreferrer">Behance</a><a href="https://instagram.com" rel="noreferrer">Instagram</a></div><a href="mailto:hello@chulda.graphics">hello@chulda.graphics</a></div>
     </footer>
   );
