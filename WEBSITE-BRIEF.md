@@ -10,6 +10,7 @@ Status: awaiting design approval. Research performed 2026-10-04. Documentation o
 - No current website URL supplied; repository homepage is unset.
 - GitHub check on main: failed `Workers Builds: official-website`. This is evidence of a Workers integration, not confirmation of Cloudflare Pages. Dashboard redirects to sign-in; project type, production branch, build command, output directory, domains and preview settings remain unverified.
 - Before implementation/deployment, confirm Pages versus Workers with the owner and authenticated settings. Production stays approval-gated. Use branch previews only after verifying isolation from production; no deploy commands or main changes in Phase 1.
+- Post-push finding: the documentation branch automatically triggered `Workers Builds: portfolio-website`; it completed with failure. Its dashboard link includes `/production/builds/`, so branch isolation must not be assumed. No deployment command was issued. Resolve this integration and its production-branch settings before pushing implementation code.
 - No framework to preserve today. Later recommendation: a small static-first framework with generated HTML for every route (Astro is a candidate), selectively using GSAP for the five approved effects. Choose after approval; React Bits is reference material, not a reason to change stacks.
 
 ## Visual direction

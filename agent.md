@@ -16,3 +16,5 @@ always use gpt taste skill in every prompt
 ## Current deployment evidence
 
 The repository is empty of site source and hosting configuration at Phase 1. The main commit reports a failed `Workers Builds: official-website` check, not a verified Pages deployment. Cloudflare dashboard settings require authenticated access. Recheck production branch/build settings before any deployment action; implementation branch pushes must not publish production.
+
+The Phase 1 documentation branch push also triggered `Workers Builds: portfolio-website`, which failed; its dashboard URL includes `/production/builds/`. Verify and correct branch isolation before pushing implementation code. Do not assume a non-main branch is automatically a preview.
