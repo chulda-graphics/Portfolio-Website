@@ -1,0 +1,5 @@
+---
+import { projects } from '../data/site';
+import Arrow from './Arrow.astro';
+---
+{projects.length ? <div class="work-grid">{projects.map(project => <a class="project-card" href={`/work/${project.slug}`}><img src={project.poster} alt={project.posterAlt} loading="lazy" width="1600" height="1000"/><div class="project-card-caption"><h3>{project.title}</h3><Arrow/></div><p>{project.summary}</p></a>)}</div> : <div class="work-pending"><span class="small-label">Selected projects</span><div><h3>Good work deserves<br/>a proper story.</h3><p>Project films and case studies will appear here once the content is ready.</p></div><a class="text-link" href="/work/project-template">Preview case-study layout <Arrow/></a></div>}

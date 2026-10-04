@@ -2,6 +2,8 @@
 
 Status: awaiting design approval. Research performed 2026-10-04. Documentation only; no site implementation.
 
+Phase 2 update: the owner authorized the visual foundation and confirmed implementation-branch isolation to previews. The approved direction is implemented as a static Astro site; advanced motion remains deferred. Phase 1 observations below are retained as research history. See `docs/PHASE-2.md` for validation and current limitations.
+
 ## Repository and hosting audit
 
 - Supplied repository: https://github.com/chulda-graphics/Portfolio-Website (carried forward from the earlier message; the Phase 1 URL placeholder does not replace it).

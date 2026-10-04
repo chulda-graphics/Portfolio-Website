@@ -1,0 +1,59 @@
+---
+import '@fontsource-variable/geist';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import { navigation, site } from '../data/site';
+import Arrow from '../components/Arrow.astro';
+interface Props { title?: string; description?: string; noindex?: boolean; }
+const { title = 'SaaS stories. Designed to move.', description = 'Dhrex — a personal portfolio of SaaS motion design.', noindex = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const active = (href: string) => href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#F6F4EF"/>
+    <title>{title} — DHREX</title>
+    <meta name="description" content={description}/>
+    {noindex && <meta name="robots" content="noindex, nofollow"/>}
+    <meta property="og:title" content={`${title} — DHREX`}/>
+    <meta property="og:description" content={description}/>
+    <meta property="og:type" content="website"/>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="nav-shell glass">
+        <a class="wordmark" href="/" aria-label="Dhrex home">dhrex<span aria-hidden="true">.</span></a>
+        <nav class="desktop-nav" aria-label="Primary"><ul>{navigation.map(item => <li><a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a></li>)}</ul></nav>
+        <a class="header-contact" href="/contact">Let’s talk <Arrow/></a>
+        <details class="mobile-menu">
+          <summary>Menu <span class="menu-glyph" aria-hidden="true"><i></i><i></i></span></summary>
+          <nav class="mobile-nav" aria-label="Mobile primary"><ul>{navigation.map(item => <li><a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}<Arrow/></a></li>)}</ul></nav>
+        </details>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"><slot/></main>
+    <footer class="site-footer container">
+      <div class="footer-top"><a class="wordmark" href="/">dhrex<span aria-hidden="true">.</span></a><p>SaaS stories.<br/>Designed to move.</p><a class="text-link" href="/contact">Let’s talk <Arrow/></a></div>
+      <div class="footer-bottom"><span>© {new Date().getUTCFullYear()} {site.name}</span><nav aria-label="Footer"><ul>{navigation.map(item => <li><a href={item.href}>{item.label}</a></li>)}</ul></nav><span>Motion, with purpose.</span></div>
+    </footer>
+    <script>
+      const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+      if (menu) {
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && menu.open) {
+            menu.open = false;
+            menu.querySelector('summary')?.focus();
+          }
+        });
+        document.addEventListener('click', (event) => {
+          if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+        });
+      }
+    </script>
+  </body>
+</html>

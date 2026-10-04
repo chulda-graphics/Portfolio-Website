@@ -1,0 +1,8 @@
+---
+interface Props { label: string; detail?: string; class?: string; }
+const { label, detail = 'Media not supplied', class: className = '' } = Astro.props;
+---
+<div class:list={['media-frame', className]} role="img" aria-label={`${label.replace(/[.!]$/, '')}. ${detail}.`}>
+  <div class="media-frame-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="media-frame-caption"><span>{label}</span><span>{detail}</span></div>
+</div>
